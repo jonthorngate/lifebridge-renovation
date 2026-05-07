@@ -902,7 +902,7 @@ async function loadFromAPI() {
       if (d.data.lb_projects)     projects    = parseVal(d.data.lb_projects);
       // lb_volunteers intentionally skipped — data is hardcoded
       if (d.data.lb_qbo_data)          qboData              = parseVal(d.data.lb_qbo_data);
-      if (d.data.lb_qbo_updated)       window._qboUpdated   = parseVal(d.data.lb_qbo_updated);
+      if (d.data.lb_qbo_updated) { var rawDate = parseVal(d.data.lb_qbo_updated); window._qboUpdated = typeof rawDate === 'string' ? rawDate.replace(/"/g,'') : rawDate; }
       if (d.data.lb_overview_highlight) window._overviewHighlight = parseVal(d.data.lb_overview_highlight);
     }
     phases.forEach(function(ph){ if(!projects[ph.id]) projects[ph.id]=[]; });
