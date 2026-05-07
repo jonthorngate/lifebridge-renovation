@@ -2022,9 +2022,12 @@ function renderOverview() {
 
   // ── Gantt Timeline ──────────────────────────────────────
   var PHASE_SCHEDULE = [
-    { name: 'Phase 1: 473 Demo & Exterior Rebuild',       color: '#2b4560', startYear: 2026, startMonth: 1,  endYear: 2026, endMonth: 10 },
-    { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1,  endYear: 2027, endMonth: 10 },
-    { name: 'Phase 3: Remodel Church Building',           color: '#2a7a5a', startYear: 2028, startMonth: 1,  endYear: 2028, endMonth: 10 },
+    { name: 'Phase 1: 473 Demo & Exterior Rebuild',       color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12,
+      projects: ['Management & Planning','Remodel Leased Space','473 Site Prep'] },
+    { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12,
+      projects: ['Addition Shell','Addition Mechanicals','Addition Interior Finishing','Front Facade Finishing','Rear Facade, Patio, Awning, & Walkway','Openings & 473 Space Remodeling'] },
+    { name: 'Phase 3: Remodel Church Building',           color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12,
+      projects: ['Plan Approval','Move Bathrooms, Expand Lobby, & Security Doors','Conference Room, Cry Room, & Prayer Room','Open Up/Expand Worship Space','Kitchen Storage Finishing'] },
   ];
 
   // Calendar spans Jan 2026 – Dec 2028 = 36 months total
@@ -2085,12 +2088,17 @@ function renderOverview() {
     }
 
     var shortName = ph.name.replace(/Phase \d+: /, '');
+    var hasProjects = ph.projects && ph.projects.length > 0;
 
-    tHtml += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
+    tHtml += '<div style="margin-bottom:6px;">';
+    tHtml += '<div style="display:flex;align-items:center;">';
     // Phase label
     tHtml += '<div style="width:220px;flex-shrink:0;padding-right:12px;">';
     tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:'+ph.color+';">Phase '+(pi+1)+'</div>';
-    tHtml += '<div style="font-size:.82rem;font-weight:600;color:var(--navy-deep);line-height:1.2;">'+shortName+'</div>';
+    tHtml += '<div style="display:flex;align-items:center;gap:5px;cursor:'+(hasProjects?'pointer':'default')+';" '+(hasProjects ? 'onclick="toggleTimelinePhase('+pi+')"' : '')+'>';
+    tHtml += '<span style="font-size:.82rem;font-weight:600;color:var(--navy-deep);line-height:1.2;">'+shortName+'</span>';
+    if (hasProjects) tHtml += '<span id="tl-arrow-'+pi+'" style="font-size:.6rem;color:'+ph.color+';transition:transform .2s;transform:rotate(0deg);">&#9660;</span>';
+    tHtml += '</div>';
     tHtml += '</div>';
     // Grid bar area
     tHtml += '<div style="flex:1;position:relative;height:32px;">';
@@ -2118,16 +2126,19 @@ function renderOverview() {
       tHtml += '<div style="position:absolute;top:0;bottom:0;left:'+todayLeft+'%;width:2px;background:#c47f18;z-index:2;"></div>';
     }
     tHtml += '</div></div>';
-  });
 
-  // ── "Today" marker legend ──
-  tHtml += '<div style="display:flex;gap:20px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;">';
-  tHtml += '<span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:14px;height:14px;border-radius:3px;background:#2b4560;display:inline-block;"></span>Completed / In Progress</span>';
-  tHtml += '<span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:14px;height:14px;border-radius:3px;background:#2b456040;border:1px solid #2b4560;display:inline-block;"></span>Upcoming</span>';
-  if (nowOffset >= 0) {
-    tHtml += '<span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:3px;height:14px;background:#c47f18;display:inline-block;"></span>Current Month (QBO)</span>';
-  }
-  tHtml += '</div>';
+    // Projects dropdown
+    if (hasProjects) {
+      tHtml += '<div id="tl-projects-'+pi+'" style="display:none;margin-left:220px;padding:6px 0 10px;border-left:3px solid '+ph.color+';">';
+      ph.projects.forEach(function(proj) {
+        tHtml += '<div style="padding:3px 14px;font-size:.82rem;color:var(--navy);display:flex;align-items:center;gap:7px;">';
+        tHtml += '<span style="width:6px;height:6px;border-radius:50%;background:'+ph.color+';flex-shrink:0;display:inline-block;"></span>';
+        tHtml += proj + '</div>';
+      });
+      tHtml += '</div>';
+    }
+    tHtml += '</div>'; // close outer
+  });
 
   document.getElementById('overview-timeline').innerHTML = tHtml;
 
@@ -2142,6 +2153,16 @@ function renderOverview() {
 
 // ── QBO-driven budget rendering ─────────────────────────────
 
+
+
+function toggleTimelinePhase(idx) {
+  var body = document.getElementById('tl-projects-' + idx);
+  var arrow = document.getElementById('tl-arrow-' + idx);
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
 
 function togglePhaseCollapse(phId) {
   var body = document.getElementById(phId + '-body');
