@@ -900,7 +900,7 @@ async function loadFromAPI() {
       if (d.data.lb_year_budgets) yearBudgets = parseVal(d.data.lb_year_budgets);
       if (d.data.lb_phases)       phases      = parseVal(d.data.lb_phases);
       if (d.data.lb_projects)     projects    = parseVal(d.data.lb_projects);
-      if (d.data.lb_volunteers)        volunteers           = parseVal(d.data.lb_volunteers);
+      // lb_volunteers intentionally skipped — data is hardcoded
       if (d.data.lb_qbo_data)          qboData              = parseVal(d.data.lb_qbo_data);
       if (d.data.lb_qbo_updated)       window._qboUpdated   = parseVal(d.data.lb_qbo_updated);
       if (d.data.lb_overview_highlight) window._overviewHighlight = parseVal(d.data.lb_overview_highlight);
@@ -1256,7 +1256,7 @@ let volunteers = [
 let volDeleteIndex = null;
 
 function saveVol() {
-  return; // volunteer data is static — no saving
+  return; // volunteer data is hardcoded — no saving
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(function() {
     fetch('/api/data/bulk', {
@@ -2346,7 +2346,7 @@ loadFromAPI().then(function() {
           if (d.data.lb_year_budgets) yearBudgets = parseVal(d.data.lb_year_budgets);
           if (d.data.lb_phases)       phases      = parseVal(d.data.lb_phases);
           if (d.data.lb_projects)     projects    = parseVal(d.data.lb_projects);
-          if (d.data.lb_volunteers)   volunteers  = parseVal(d.data.lb_volunteers);
+          // lb_volunteers intentionally skipped — data is hardcoded
           _dataLoaded = false; // prevent saves from public view
         }
         renderOverview();
