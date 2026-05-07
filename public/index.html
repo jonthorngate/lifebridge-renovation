@@ -618,7 +618,7 @@
 
 <div class="nav-tabs" style="display:flex;justify-content:space-between;align-items:center;padding-right:20px;">
   <div style="display:flex;">
-    <button class="nav-tab" id="tab-overview" onclick="switchPage('overview')">Building Project Details</button>
+    <button class="nav-tab" id="tab-overview" onclick="switchPage('overview')">Project Overview</button>
     <button class="nav-tab active admin-tab" id="tab-budget" onclick="switchPage('budget')">Budget</button>
     <button class="nav-tab admin-tab" id="tab-volunteers" onclick="switchPage('volunteers')">Volunteers</button>
   </div>
@@ -637,9 +637,8 @@
 
   <!-- Header -->
   <div style="margin-bottom:28px;">
-    <div class="section-label">Quarterly Overview</div>
-    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:800;color:var(--navy-deep);margin-bottom:6px;">Where We Are Right Now</h2>
-    <p style="color:var(--text-muted);font-size:.9rem;">Four numbers that tell the story this quarter.</p>
+    <div class="section-label">Monthly Overview</div>
+    <h2 id="overview-heading" style="font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:800;color:var(--navy-deep);margin-bottom:6px;">Where We Are Right Now</h2>
   </div>
 
   <!-- 4 Stat Cards -->
@@ -649,23 +648,7 @@
   <!-- Timeline -->
   <div class="section-label" style="margin-top:8px;">Project Timeline</div>
   <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow-sm);">
-    <div style="display:grid;grid-template-columns:220px 1fr;gap:0;">
-      <!-- Year headers -->
-      <div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--border);padding-bottom:8px;margin-bottom:16px;">
-        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:var(--navy);text-align:center;">2026</div>
-        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:var(--navy);text-align:center;">2027</div>
-        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:var(--navy);text-align:center;">2028</div>
-      </div>
-    </div>
-    <!-- Phase rows -->
     <div id="overview-timeline"></div>
-    <!-- Legend -->
-    <div style="display:flex;gap:20px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
-      <span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:12px;height:12px;border-radius:50%;background:#2a7a5a;display:inline-block;"></span>Completed</span>
-      <span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:12px;height:12px;border-radius:50%;background:#c47f18;display:inline-block;"></span>In Progress</span>
-      <span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:12px;height:12px;border-radius:50%;background:var(--navy);display:inline-block;"></span>Upcoming</span>
-    </div>
   </div>
 
 
@@ -683,9 +666,6 @@
     </div>
     <span style="opacity:.7;font-size:.75rem;font-family:Montserrat,sans-serif;letter-spacing:.05em;">SOURCE: QUICKBOOKS</span>
   </div>
-
-  <!-- KPI Cards -->
-  <div class="kpi-grid" id="kpi-grid"></div>
 
   <!-- Overall + Phase Progress -->
   <div class="progress-section">
@@ -707,19 +687,7 @@
   <div class="section-label" style="margin-top:8px;">Phase Breakdown</div>
   <div id="qbo-phase-breakdown"></div>
 
-  <!-- Budget Health Summary -->
-  <div class="two-col" style="margin-top:8px;">
-    <div class="panel">
-      <div class="panel-head"><h2>Phase Summary</h2></div>
-      <div class="panel-body" style="padding:0;">
-        <table class="proj-table" id="phase-summary-table"></table>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-head"><h2>Budget Health</h2></div>
-      <div class="panel-body" id="health-panel"></div>
-    </div>
-  </div>
+
 
   <!-- Report Info -->
   <div id="qbo-report-info" style="margin-top:16px;padding:10px 16px;background:var(--off-white);border-radius:8px;border:1px solid var(--border);font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
@@ -1020,9 +988,10 @@ function renderKPI() {
     {icon:'📊', label:'Total Spent',    value:fmt(spent),   sub:pct(spent,total)+'% used'},
     {icon:'💰', label:'Remaining',      value:fmt(rem),     sub:rem<0?'⚠ Over budget':'Available'},
     {icon:'⏱', label:'Time Elapsed',   value:Math.round(elapsed/totalDays*100)+'%', sub:Math.round(elapsed).toLocaleString()+' days'},
-    {icon:'💵', label:'Vol. Savings',   value:fmt(volSav),  sub:'saved through volunteers', hi:false},
+    {icon:'💵', label:'Vol. Savings',   value:fmt(volSav),  sub:'saved with volunteer labor', hi:false},
   ];
-  document.getElementById('kpi-grid').innerHTML = cards.map(function(c){
+  var kpiEl = document.getElementById('kpi-grid'); if (!kpiEl) return;
+  kpiEl.innerHTML = cards.map(function(c){
     return '<div class="kpi-card '+(c.hi?'highlight':'')+'"><div class="kpi-icon">'+c.icon+'</div><div class="kpi-label">'+c.label+'</div><div class="kpi-value">'+c.value+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
   }).join('');
 }
@@ -1297,10 +1266,8 @@ function totalVolSavings() { return volunteers.reduce(function(s,v){ return s+(v
 
 function renderVolKPI() {
   var totalSav = totalVolSavings();
-  var totalEntries = volunteers.length;
   var cards = [
-    { icon:'🙌', label:'Total Contributions', value: totalEntries, sub:'projects logged', hi:true },
-    { icon:'💵', label:'Total Value Saved', value: fmt(totalSav), sub:'saved through volunteers', hi:true },
+    { icon:'💵', label:'Total Value Saved', value: fmt(totalSav), sub:'saved with volunteer labor', hi:true },
   ];
   document.getElementById('vol-kpi-grid').innerHTML = cards.map(function(c){
     return '<div class="kpi-card '+(c.hi?'highlight':'')+'"><div class="kpi-icon">'+c.icon+'</div><div class="kpi-label">'+c.label+'</div><div class="kpi-value">'+c.value+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
@@ -2009,6 +1976,18 @@ function getMilestoneStatus(phaseIdx, milestoneMonth, milestoneYear) {
 }
 
 function renderOverview() {
+  // Update heading dynamically
+  var headingEl = document.getElementById('overview-heading');
+  if (headingEl) {
+    if (window._qboUpdated) {
+      var hd = new Date(window._qboUpdated);
+      var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      headingEl.textContent = 'Where We Are As of ' + monthNames[hd.getMonth()] + ' ' + hd.getFullYear();
+    } else {
+      headingEl.textContent = 'Where We Are Right Now';
+    }
+  }
+
   var ts = totalSpent();
   var phasePct = getPhaseProgress();
   var totalVolSav = volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0);
@@ -2016,18 +1995,21 @@ function renderOverview() {
 
   // Stat cards
   var cards = [
-    { label: 'PHASE PROGRESS', value: phasePct + '%', sub: (function(){
+    { label: 'PROJECT PROGRESS', value: phasePct + '%', sub: (function(){
         if (!window._qboUpdated) return 'no QBO data loaded';
         var qboDate = new Date(window._qboUpdated);
         var qboYear = qboDate.getFullYear();
         var qboMonth = qboDate.getMonth() + 1;
-        var completed = ALL_MILESTONES.filter(function(m){ return m.year < qboYear || (m.year === qboYear && m.month <= qboMonth); }).length;
-        var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return completed + ' of 13 milestones · thru ' + monthNames[qboDate.getMonth()] + ' ' + qboYear;
+        // Determine which phase we are currently in based on QBO date
+        var currentPhase = 1;
+        if (qboYear >= 2028) currentPhase = 3;
+        else if (qboYear >= 2027) currentPhase = 2;
+        else currentPhase = 1;
+        return 'Phase ' + currentPhase + ' of 3';
       })(), color: '#2b4560' },
     { label: 'SPENT TO DATE', value: fmt(ts), sub: 'of ' + fmt(TOTAL_BUDGET) + ' total project budget', color: '#c05f3c' },
     { label: 'TOTAL VOLUNTEERS', value: totalVolPeople.toLocaleString(), sub: 'contributed across all projects', color: '#2a7a5a' },
-    { label: 'VOLUNTEER SAVINGS', value: fmt(totalVolSav), sub: 'total saved through volunteers', color: '#c47f18' },
+    { label: 'VOLUNTEER SAVINGS', value: fmt(totalVolSav), sub: 'total saved with volunteer labor', color: '#c47f18' },
   ];
 
   document.getElementById('overview-cards').innerHTML = cards.map(function(c) {
@@ -2038,66 +2020,116 @@ function renderOverview() {
       + '</div>';
   }).join('');
 
-  // Timeline
-  var phaseColors = ['#2b4560', '#c05f3c', '#2a7a5a'];
-  var phaseYears = [
-    { year: 2026, months: ['Apr','May','Jun','Aug','Oct'] },
-    { year: 2027, months: ['Mar','Jun','Aug'] },
-    { year: 2028, months: ['Jan','Apr','Jun','Aug','Oct'] },
+  // ── Gantt Timeline ──────────────────────────────────────
+  var PHASE_SCHEDULE = [
+    { name: 'Phase 1: 473 Demo & Exterior Rebuild',       color: '#2b4560', startYear: 2026, startMonth: 1,  endYear: 2026, endMonth: 10 },
+    { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1,  endYear: 2027, endMonth: 10 },
+    { name: 'Phase 3: Remodel Church Building',           color: '#2a7a5a', startYear: 2028, startMonth: 1,  endYear: 2028, endMonth: 10 },
   ];
-  var timelineHtml = phases.map(function(ph, i) {
-    var color = phaseColors[i] || '#2b4560';
-    var phSpent = phaseSpent(ph.id);
-    // Calculate phase milestone completion based on QBO date
-    var phaseMilestones = ALL_MILESTONES.filter(function(m){ return m.phase === i; });
-    var phaseCompleted = 0;
-    if (window._qboUpdated) {
-      var qd = new Date(window._qboUpdated);
-      var qy = qd.getFullYear(), qm = qd.getMonth()+1;
-      phaseCompleted = phaseMilestones.filter(function(m){ return m.year < qy || (m.year === qy && m.month <= qm); }).length;
+
+  // Calendar spans Jan 2026 – Dec 2028 = 36 months total
+  var CAL_START_YEAR = 2026, CAL_START_MONTH = 1;
+  var TOTAL_MONTHS = 36;
+
+  function monthOffset(year, month) {
+    return (year - CAL_START_YEAR) * 12 + (month - CAL_START_MONTH);
+  }
+
+  // Current position marker based on QBO date
+  var nowOffset = -1;
+  if (window._qboUpdated) {
+    var nd = new Date(window._qboUpdated);
+    nowOffset = monthOffset(nd.getFullYear(), nd.getMonth() + 1);
+  }
+
+  var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var years = [2026, 2027, 2028];
+
+  // Build HTML
+  var tHtml = '';
+
+  // ── Year + Month header ──
+  tHtml += '<div style="display:flex;margin-bottom:4px;">';
+  tHtml += '<div style="width:220px;flex-shrink:0;"></div>';
+  tHtml += '<div style="flex:1;display:flex;">';
+  years.forEach(function(yr) {
+    tHtml += '<div style="flex:1;text-align:center;font-family:Montserrat,sans-serif;font-weight:800;font-size:.95rem;color:var(--navy);border-left:1px solid var(--border);padding-bottom:4px;">'+yr+'</div>';
+  });
+  tHtml += '</div></div>';
+
+  // Month labels row
+  tHtml += '<div style="display:flex;margin-bottom:12px;">';
+  tHtml += '<div style="width:220px;flex-shrink:0;"></div>';
+  tHtml += '<div style="flex:1;display:grid;grid-template-columns:repeat(36,1fr);">';
+  for (var mi = 0; mi < 36; mi++) {
+    var mLabel = MONTHS_SHORT[mi % 12];
+    var isJan = (mi % 12 === 0);
+    tHtml += '<div style="font-size:.55rem;color:var(--text-muted);text-align:center;border-left:'+(isJan?'2px solid var(--border)':'1px solid #eee')+';padding:1px 0;">'+mLabel+'</div>';
+  }
+  tHtml += '</div></div>';
+
+  // ── Phase rows ──
+  PHASE_SCHEDULE.forEach(function(ph, pi) {
+    var startOff = monthOffset(ph.startYear, ph.startMonth);
+    var endOff   = monthOffset(ph.endYear,   ph.endMonth);
+    var spanMonths = endOff - startOff + 1;
+
+    // Determine phase status
+    var phaseStatus, barColor, labelColor;
+    if (nowOffset < startOff) {
+      phaseStatus = 'Upcoming'; barColor = ph.color + '40'; labelColor = ph.color;
+    } else if (nowOffset <= endOff) {
+      phaseStatus = 'In Progress'; barColor = ph.color; labelColor = '#fff';
+    } else {
+      phaseStatus = 'Completed'; barColor = ph.color; labelColor = '#fff';
     }
-    var phasePctDone = Math.round(phaseCompleted / phaseMilestones.length * 100);
-    var dotYear = phaseYears[i];
-    var dots = dotYear ? dotYear.months.map(function(m, di) {
-      // Map month label to month number
-      var monthMap = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
-      var mNum = monthMap[m] || 1;
-      var status = getMilestoneStatus(i, mNum, dotYear.year);
-      var dotBg, dotBorder, dotSize;
-      if (status === 'completed') {
-        dotBg = color; dotBorder = color; dotSize = '14px';
-      } else if (status === 'current') {
-        dotBg = '#c47f18'; dotBorder = '#c47f18'; dotSize = '16px'; // amber = in progress
-      } else {
-        dotBg = 'transparent'; dotBorder = color; dotSize = '14px'; // hollow = upcoming
-      }
-      return '<span style="display:inline-flex;flex-direction:column;align-items:center;gap:2px;">'
-        + '<span style="width:'+dotSize+';height:'+dotSize+';border-radius:50%;background:'+dotBg+';border:2px solid '+dotBorder+';display:inline-block;"></span>'
-        + '<span style="font-size:.62rem;color:var(--text-muted);">' + m + '</span>'
-        + '</span>';
-    }).join('') : '';
 
-    // Position dots in correct year column
-    var col1 = i === 0 ? dots : '';
-    var col2 = i === 1 ? dots : '';
-    var col3 = i === 2 ? dots : '';
+    var shortName = ph.name.replace(/Phase \d+: /, '');
 
-    return '<div style="display:grid;grid-template-columns:220px 1fr;gap:0;padding:12px 0;border-bottom:1px solid var(--border);">'
-      + '<div style="display:flex;align-items:flex-start;gap:8px;padding-right:16px;">'
-      + '<div style="width:4px;height:100%;min-height:50px;background:' + color + ';border-radius:2px;flex-shrink:0;"></div>'
-      + '<div>'
-      + '<div style="font-family:Montserrat,sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;color:' + color + ';letter-spacing:.08em;">Phase ' + (i+1) + '</div>'
-      + '<div style="font-weight:700;font-size:.92rem;color:var(--navy-deep);">' + ph.name.replace(/Phase \d+: /,'') + '</div>'
-      + '<div style="font-size:.75rem;color:var(--text-muted);">' + fmt(ph.budget) + ' budget &nbsp;·&nbsp; ' + phasePctDone + '% spent</div>'
-      + '</div></div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;">'
-      + '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' + col1 + '</div>'
-      + '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' + col2 + '</div>'
-      + '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' + col3 + '</div>'
-      + '</div>'
-      + '</div>';
-  }).join('');
-  document.getElementById('overview-timeline').innerHTML = timelineHtml;
+    tHtml += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
+    // Phase label
+    tHtml += '<div style="width:220px;flex-shrink:0;padding-right:12px;">';
+    tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:'+ph.color+';">Phase '+(pi+1)+'</div>';
+    tHtml += '<div style="font-size:.82rem;font-weight:600;color:var(--navy-deep);line-height:1.2;">'+shortName+'</div>';
+    tHtml += '</div>';
+    // Grid bar area
+    tHtml += '<div style="flex:1;position:relative;height:32px;">';
+    // Background grid lines
+    tHtml += '<div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);">';
+    tHtml += '<div style="border-left:2px solid var(--border);"></div>';
+    tHtml += '<div style="border-left:2px solid var(--border);"></div>';
+    tHtml += '<div style="border-left:2px solid var(--border);border-right:2px solid var(--border);"></div>';
+    tHtml += '</div>';
+    // Phase bar
+    var leftPct  = (startOff / TOTAL_MONTHS * 100).toFixed(2);
+    var widthPct = (spanMonths / TOTAL_MONTHS * 100).toFixed(2);
+    tHtml += '<div style="position:absolute;top:4px;bottom:4px;left:'+leftPct+'%;width:'+widthPct+'%;background:'+barColor+';border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;">';
+    tHtml += '<span style="font-size:.7rem;font-weight:700;color:'+labelColor+';font-family:Montserrat,sans-serif;white-space:nowrap;padding:0 8px;">'+phaseStatus+'</span>';
+    tHtml += '</div>';
+    // Progress fill overlay (completed portion)
+    if (nowOffset >= startOff && nowOffset <= endOff) {
+      var progressPct = ((nowOffset - startOff + 1) / spanMonths * 100).toFixed(2);
+      var progressWidth = (parseFloat(widthPct) * parseFloat(progressPct) / 100).toFixed(2);
+      tHtml += '<div style="position:absolute;top:4px;bottom:4px;left:'+leftPct+'%;width:'+progressWidth+'%;background:'+ph.color+';border-radius:6px 0 0 6px;opacity:.5;"></div>';
+    }
+    // "Today" marker
+    if (nowOffset >= 0 && nowOffset <= 35) {
+      var todayLeft = ((nowOffset + 0.5) / TOTAL_MONTHS * 100).toFixed(2);
+      tHtml += '<div style="position:absolute;top:0;bottom:0;left:'+todayLeft+'%;width:2px;background:#c47f18;z-index:2;"></div>';
+    }
+    tHtml += '</div></div>';
+  });
+
+  // ── "Today" marker legend ──
+  tHtml += '<div style="display:flex;gap:20px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;">';
+  tHtml += '<span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:14px;height:14px;border-radius:3px;background:#2b4560;display:inline-block;"></span>Completed / In Progress</span>';
+  tHtml += '<span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:14px;height:14px;border-radius:3px;background:#2b456040;border:1px solid #2b4560;display:inline-block;"></span>Upcoming</span>';
+  if (nowOffset >= 0) {
+    tHtml += '<span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);"><span style="width:3px;height:14px;background:#c47f18;display:inline-block;"></span>Current Month (QBO)</span>';
+  }
+  tHtml += '</div>';
+
+  document.getElementById('overview-timeline').innerHTML = tHtml;
 
   // Restore highlight text
   try {
@@ -2109,6 +2141,16 @@ function renderOverview() {
 
 
 // ── QBO-driven budget rendering ─────────────────────────────
+
+
+function togglePhaseCollapse(phId) {
+  var body = document.getElementById(phId + '-body');
+  var arrow = document.getElementById(phId + '-arrow');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : '';
+}
 
 function renderQBOBreakdown() {
   var el = document.getElementById('qbo-phase-breakdown');
@@ -2127,13 +2169,17 @@ function renderQBOBreakdown() {
     var phBudget = phase.budget || 0;
     var phSpent = phase.spent || 0;
     var phPct = phBudget > 0 ? Math.min(Math.round(phSpent/phBudget*100), 100) : 0;
-    var phStatus = phBudget > 0 && phSpent > phBudget ? 'AT RISK' : phPct > 80 ? 'WATCH' : 'ON TRACK';
-    var phStatusColor = phStatus === 'AT RISK' ? '#dc3545' : phStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+    var phStatus = phSpent === 0 ? 'NOT STARTED' : phBudget > 0 && phSpent > phBudget ? 'AT RISK' : phPct > 80 ? 'WATCH' : 'ON TRACK';
+    var phStatusColor = phStatus === 'NOT STARTED' ? '#6c757d' : phStatus === 'AT RISK' ? '#dc3545' : phStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
 
     html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-sm);">';
     // Phase header
-    html += '<div style="background:'+phColor+';padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">';
+    var phId = 'phase-collapse-'+pi;
+    html += '<div style="background:'+phColor+';padding:12px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="togglePhaseCollapse(\''+phId+'\')">'
+;    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<span id="'+phId+'-arrow" style="color:#fff;font-size:.8rem;transition:transform .2s;">&#9660;</span>';
     html += '<span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:.95rem;color:#fff;">'+phase.name+'</span>';
+    html += '</div>';
     html += '<div style="display:flex;align-items:center;gap:16px;">';
     html += '<span style="font-size:.82rem;color:rgba(255,255,255,.8);">'+fmt(phSpent)+' / '+fmt(phBudget)+'</span>';
     html += '<span style="background:'+phStatusColor+';color:#fff;font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:4px;font-family:Montserrat,sans-serif;letter-spacing:.05em;white-space:nowrap;">'+phStatus+'</span>';
@@ -2141,15 +2187,15 @@ function renderQBOBreakdown() {
     // Phase progress bar
     html += '<div style="height:6px;background:#e8edf2;"><div style="height:6px;width:'+phPct+'%;background:'+phColor+';transition:width .5s;"></div></div>';
 
-    // Projects
-    html += '<div style="padding:0 16px 8px;">';
+    // Projects (collapsible)
+    html += '<div id="'+phId+'-body" style="padding:0 16px 8px;">';
     (phase.projects || []).forEach(function(proj) {
       var prBudget = proj.budget || 0;
       var prSpent = proj.spent || 0;
       if (prSpent === 0 && prBudget === 0) return; // skip empty
       var prPct = prBudget > 0 ? Math.min(Math.round(prSpent/prBudget*100), 100) : 0;
-      var prStatus = prBudget > 0 && prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
-      var prStatusColor = prStatus === 'AT RISK' ? '#dc3545' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+      var prStatus = prSpent === 0 ? 'NOT STARTED' : prBudget > 0 && prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'AT RISK' ? '#dc3545' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
       var barColor = prStatus === 'AT RISK' ? '#dc3545' : phColor;
 
       html += '<div style="border-bottom:1px solid var(--border);padding:10px 4px;">';
@@ -2202,8 +2248,8 @@ function renderPhaseSummaryTable() {
   var PHASE_COLORS = ['#2b4560','#c05f3c','#2a7a5a'];
   qboData.forEach(function(phase, pi) {
     var b = phase.budget || 0, s = phase.spent || 0, r = b - s;
-    var status = s > b ? 'AT RISK' : (b > 0 && s/b > 0.8) ? 'WATCH' : 'ON TRACK';
-    var sc = status === 'AT RISK' ? '#dc3545' : status === 'WATCH' ? '#c47f18' : '#2a7a5a';
+    var status = s === 0 ? 'NOT STARTED' : s > b ? 'AT RISK' : (b > 0 && s/b > 0.8) ? 'WATCH' : 'ON TRACK';
+    var sc = status === 'NOT STARTED' ? '#6c757d' : status === 'AT RISK' ? '#dc3545' : status === 'WATCH' ? '#c47f18' : '#2a7a5a';
     var shortName = phase.name.replace(/Phase \d+ - /, '');
     html += '<tr style="border-bottom:1px solid var(--border);">';
     html += '<td style="padding:10px 16px;font-weight:600;color:'+PHASE_COLORS[pi]+';">'+shortName+'</td>';
