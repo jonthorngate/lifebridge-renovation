@@ -908,7 +908,9 @@ async function loadFromAPI() {
         if (typeof rawDate === 'string') {
           try { rawDate = JSON.parse(rawDate); } catch(e) { /* already a plain string */ }
         }
-        window._qboUpdated = String(rawDate).replace(/"/g,'');
+        var cleanDate = String(rawDate).replace(/"/g,'');
+        // Add noon time to prevent timezone from shifting the date
+        window._qboUpdated = cleanDate.includes('T') ? cleanDate : cleanDate + 'T12:00:00';
       }
       if (d.data.lb_overview_highlight) window._overviewHighlight = parseVal(d.data.lb_overview_highlight);
     }
