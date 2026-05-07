@@ -705,14 +705,8 @@
 
 
 
-  <!-- Volunteer Log -->
-  <div class="section-label">Volunteer Contributions</div>
-  <div class="log-section">
-    <div class="log-toolbar">
-      <h2>All Contributions</h2>
-    </div>
-    <div id="vol-table-wrap"></div>
-  </div>
+  <!-- Volunteer Summary -->
+  <div id="vol-table-wrap"></div>
 
 </div><!-- /page-volunteers -->
 
@@ -981,7 +975,7 @@ function renderKPI() {
   var spent = totalSpent();
   var total = qboTotalBudget();
   var rem = total - spent;
-  var volSav = volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0);
+  var volSav = TOTAL_VOLUNTEER_SAVINGS;
   var elapsed = daysSinceStart(), totalDays = projectDaysTotal();
   var cards = [
     {icon:'⛪', label:'Total Budget',   value:fmt(total),   sub:'2026–2028', hi:true},
@@ -1226,11 +1220,9 @@ function showToast(msg){
 // ══════════════════════════════════════════
 // VOLUNTEER TRACKER
 // ══════════════════════════════════════════
-let volunteers = [
-  { notes: 'Leased Space Demolition', rate: 3000,  people: 33 },
-  { notes: 'Rough-In',                rate: 18000, people: 14 },
-  { notes: 'Framing, Drywall, & Ramp', rate: 20000, people: 34 },
-];
+let volunteers = []; // per-project tracking removed
+var TOTAL_UNIQUE_VOLUNTEERS = 68;
+var TOTAL_VOLUNTEER_SAVINGS = 41000;
 let volDeleteIndex = null;
 
 function saveVol() {
@@ -1262,46 +1254,30 @@ function switchPage(page) {
 }
 
 function totalVolHours() { return 0; } // removed - no longer tracked
-function totalVolSavings() { return volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0); }
+function totalVolSavings() { return TOTAL_VOLUNTEER_SAVINGS; }
 
 function renderVolKPI() {
-  var totalSav = totalVolSavings();
   var cards = [
-    { icon:'💵', label:'Total Value Saved', value: fmt(totalSav), sub:'saved with volunteer labor', hi:true },
+    { label:'Volunteers', value: TOTAL_UNIQUE_VOLUNTEERS.toLocaleString(), sub:'contributed to this project', hi:true },
+    { label:'Total Value Saved', value: fmt(TOTAL_VOLUNTEER_SAVINGS), sub:'saved with volunteer labor', hi:true },
   ];
-  document.getElementById('vol-kpi-grid').innerHTML = cards.map(function(c){
-    return '<div class="kpi-card '+(c.hi?'highlight':'')+'"><div class="kpi-icon">'+c.icon+'</div><div class="kpi-label">'+c.label+'</div><div class="kpi-value">'+c.value+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
+  var el = document.getElementById('vol-kpi-grid');
+  if (!el) return;
+  el.innerHTML = cards.map(function(c){
+    return '<div class="kpi-card '+(c.hi?'highlight':'')+'"><div class="kpi-label">'+c.label+'</div><div class="kpi-value">'+c.value+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
   }).join('');
 }
 
 function renderVolMonthly(){/* removed */}
 
 function renderVolTable() {
-  var search = '';
-  search = search.toLowerCase();
-  var filtered = volunteers.map(function(v,i){ return Object.assign({},v,{_idx:i}); }).filter(function(v){
-    if (search && (v.notes||'').toLowerCase().indexOf(search) === -1) return false;
-    return true;
-  });
-  if (!filtered.length) {
-    document.getElementById('vol-table-wrap').innerHTML = '<div class="empty-state">No contributions logged yet.</div>';
-    return;
-  }
-  var rows = filtered.map(function(v){
-    return '<tr>'
-      + '<td style="font-weight:600;color:var(--navy);">' + (v.notes||'—') + '</td>'
-      + '<td style="text-align:center;color:var(--navy);font-weight:600;">' + (v.people||0) + '</td>'
-      + '<td style="text-align:right;font-weight:700;color:var(--green);font-size:1rem;">' + fmt(v.rate||0) + '</td>'
-      + ''
-      + '</tr>';
-  }).join('');
-  var total = filtered.reduce(function(s,v){ return s+(v.rate||0); }, 0);
-  document.getElementById('vol-table-wrap').innerHTML =
-    '<table>'
-    + '<thead><tr><th>Project / Task</th><th style="text-align:center;">Volunteers</th><th style="text-align:right;">Savings Value</th></tr></thead>'
-    + '<tbody>' + rows + '</tbody>'
-    + '<tfoot><tr style="background:var(--ice-pale);font-weight:700;"><td style="padding:10px 16px;">TOTAL</td><td style="text-align:center;padding:10px 16px;color:var(--navy);">' + volunteers.reduce(function(s,v){return s+(v.people||0);},0) + '</td><td style="text-align:right;padding:10px 16px;color:var(--green);">' + fmt(total) + '</td></tr></tfoot>'
-    + '</table>';
+  var el = document.getElementById('vol-table-wrap');
+  if (!el) return;
+  el.innerHTML = '<div style="padding:24px 20px;text-align:center;color:var(--text-muted);font-size:.9rem;">'
+    + '<div style="font-size:2rem;font-weight:800;color:var(--navy);font-family:Montserrat,sans-serif;margin-bottom:6px;">'+TOTAL_UNIQUE_VOLUNTEERS+'</div>'
+    + '<div style="font-weight:600;color:var(--navy);margin-bottom:4px;">Unique Volunteers</div>'
+    + '<div style="color:var(--text-muted);font-size:.85rem;">'+fmt(TOTAL_VOLUNTEER_SAVINGS)+' saved with volunteer labor</div>'
+    + '</div>';
 }
 
 function addVolEntry(){ /* static data — no entry */ }
@@ -1990,8 +1966,8 @@ function renderOverview() {
 
   var ts = totalSpent();
   var phasePct = getPhaseProgress();
-  var totalVolSav = volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0);
-  var totalVolPeople = volunteers.reduce(function(s,v){ return s+(v.people||0); }, 0);
+  var totalVolSav = TOTAL_VOLUNTEER_SAVINGS;
+  var totalVolPeople = TOTAL_UNIQUE_VOLUNTEERS;
 
   // Stat cards
   var cards = [
@@ -2022,12 +1998,32 @@ function renderOverview() {
 
   // ── Gantt Timeline ──────────────────────────────────────
   var PHASE_SCHEDULE = [
-    { name: 'Phase 1: 473 Demo & Exterior Rebuild',       color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12,
-      projects: ['Management & Planning','Remodel Leased Space','473 Site Prep'] },
+    { name: 'Phase 1: 473 Demo & Exterior Rebuild', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12,
+      projects: [
+        { name: 'Management & Planning', details: ['Plan Approval','Certified Survey w/Parcel Combination'] },
+        { name: 'Remodel Leased Space',  details: ['Leased Space Demo','Framing, Drywall, Ramp','Rough-In','Flooring','Wall Finishing, Misc. Finishing','Room Furnishings + AV',"MEP's + Bathroom Finishes + Kitchenette",'Rear Entry Door','Rear Entry Facade Cleanup'] },
+        { name: '473 Site Prep',         details: ['Move Utilities / Build New Utility Room','Exterior Wall Pre-Build','Construction Site Setup','Interior Demo','House + Site Demo, Haulaway','Exterior Roof + Wall Rebuild + Re-Roof','Footings','Drainage Install','Infill + Gravel','Concrete + Paver Patio'] },
+      ]
+    },
     { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12,
-      projects: ['Addition Shell','Addition Mechanicals','Addition Interior Finishing','Front Facade Finishing','Rear Facade, Patio, Awning, & Walkway','Openings & 473 Space Remodeling'] },
-    { name: 'Phase 3: Remodel Church Building',           color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12,
-      projects: ['Plan Approval','Move Bathrooms, Expand Lobby, & Security Doors','Conference Room, Cry Room, & Prayer Room','Open Up/Expand Worship Space','Kitchen Storage Finishing'] },
+      projects: [
+        { name: 'Addition Shell',                            details: [] },
+        { name: 'Addition Mechanicals',                      details: [] },
+        { name: 'Addition Interior Finishing',               details: [] },
+        { name: 'Front Facade Finishing',                    details: [] },
+        { name: 'Rear Facade, Patio, Awning, & Walkway',    details: [] },
+        { name: 'Openings & 473 Space Remodeling',           details: [] },
+      ]
+    },
+    { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12,
+      projects: [
+        { name: 'Plan Approval',                                    details: [] },
+        { name: 'Move Bathrooms, Expand Lobby, & Security Doors',   details: [] },
+        { name: 'Conference Room, Cry Room, & Prayer Room',         details: [] },
+        { name: 'Open Up/Expand Worship Space',                     details: [] },
+        { name: 'Kitchen Storage Finishing',                        details: [] },
+      ]
+    },
   ];
 
   // Calendar spans Jan 2026 – Dec 2028 = 36 months total
@@ -2090,14 +2086,15 @@ function renderOverview() {
     var shortName = ph.name.replace(/Phase \d+: /, '');
     var hasProjects = ph.projects && ph.projects.length > 0;
 
-    tHtml += '<div style="margin-bottom:6px;">';
+    tHtml += '<div style="margin-bottom:4px;">';
+    // Main row: label + bar
     tHtml += '<div style="display:flex;align-items:center;">';
-    // Phase label
+    // Phase label with arrow on left
     tHtml += '<div style="width:220px;flex-shrink:0;padding-right:12px;">';
     tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:'+ph.color+';">Phase '+(pi+1)+'</div>';
     tHtml += '<div style="display:flex;align-items:center;gap:5px;cursor:'+(hasProjects?'pointer':'default')+';" '+(hasProjects ? 'onclick="toggleTimelinePhase('+pi+')"' : '')+'>';
+    if (hasProjects) tHtml += '<span id="tl-arrow-'+pi+'" style="font-size:.55rem;color:'+ph.color+';transition:transform .2s;transform:rotate(-90deg);flex-shrink:0;">&#9660;</span>';
     tHtml += '<span style="font-size:.82rem;font-weight:600;color:var(--navy-deep);line-height:1.2;">'+shortName+'</span>';
-    if (hasProjects) tHtml += '<span id="tl-arrow-'+pi+'" style="font-size:.6rem;color:'+ph.color+';transition:transform .2s;transform:rotate(0deg);">&#9660;</span>';
     tHtml += '</div>';
     tHtml += '</div>';
     // Grid bar area
@@ -2127,15 +2124,24 @@ function renderOverview() {
     }
     tHtml += '</div></div>';
 
-    // Projects dropdown
+    // Projects dropdown — appears below the label only
     if (hasProjects) {
-      tHtml += '<div id="tl-projects-'+pi+'" style="display:none;margin-left:220px;padding:6px 0 10px;border-left:3px solid '+ph.color+';">';
+      tHtml += '<div id="tl-projects-'+pi+'" style="display:none;">';
+      tHtml += '<div style="display:flex;">';
+      // Left column: projects list
+      tHtml += '<div style="width:220px;flex-shrink:0;padding:4px 12px 10px 14px;border-left:3px solid '+ph.color+';margin-left:8px;">';
       ph.projects.forEach(function(proj) {
-        tHtml += '<div style="padding:3px 14px;font-size:.82rem;color:var(--navy);display:flex;align-items:center;gap:7px;">';
+        var projName = typeof proj === 'object' ? proj.name : proj;
+        var projDetails = (typeof proj === 'object' && proj.details && proj.details.length) ? proj.details : [];
+        tHtml += '<div style="padding:4px 14px 2px;font-size:.82rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;">';
         tHtml += '<span style="width:6px;height:6px;border-radius:50%;background:'+ph.color+';flex-shrink:0;display:inline-block;"></span>';
-        tHtml += proj + '</div>';
+        tHtml += projName + '</div>';
+        projDetails.forEach(function(detail) {
+          tHtml += '<div style="padding:2px 14px 2px 30px;font-size:.76rem;color:var(--text-muted);">— ' + detail + '</div>';
+        });
       });
       tHtml += '</div>';
+      tHtml += '</div></div>';
     }
     tHtml += '</div>'; // close outer
   });
