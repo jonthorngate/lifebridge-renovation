@@ -623,12 +623,8 @@
     <button class="nav-tab admin-tab" id="tab-volunteers" onclick="switchPage('volunteers')">Volunteers</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <span id="save-indicator" style="font-size:.72rem;color:var(--ice);opacity:0;transition:opacity .4s;font-family:'Montserrat',sans-serif;letter-spacing:.05em;"></span>
-    <button onclick="exportDataJSON()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;" title="Generate PDF Report" id="pdf-btn">⬇ PDF Report</button>
     <span id="save-indicator" style="font-size:.72rem;color:var(--ice);opacity:0;transition:opacity .4s;font-family:Montserrat,sans-serif;letter-spacing:.05em;"></span>
     <button onclick="exportDataJSON()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;" title="Generate PDF Report" id="pdf-btn">⬇ PDF Report</button>
-    <button onclick="openNotifyModal()" id="notify-btn" style="display:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;">📢 Notify</button>
-    <button onclick="openWebhookModal()" id="webhook-btn" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;">⚙ Webhook</button>
     <button onclick="openAdminLoginModal()" id="admin-btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;" id="admin-login-btn">⚙ Admin</button>
     <a href="/logout" id="signout-btn" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;text-decoration:none;">Sign Out</a>
   </div>
@@ -739,51 +735,13 @@
   <!-- Vol KPI -->
   <div class="vol-kpi-grid" id="vol-kpi-grid"></div>
 
-  <!-- Vol Summary row -->
-  <div class="panel" style="margin-bottom:24px;">
-    <div class="panel-head"><h2>Monthly Summary</h2></div>
-    <div class="panel-body" id="vol-monthly-panel"></div>
-  </div>
 
-  <!-- Add Volunteer Entry -->
-  <div class="section-label">Log Volunteer Day</div>
-  <div class="form-section">
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Date</label>
-        <input type="date" id="vol-date">
-      </div>
-      <div class="form-group">
-        <label># of Volunteers</label>
-        <input type="number" id="vol-people" placeholder="e.g. 8" min="1" step="1">
-      </div>
-      <div class="form-group">
-        <label>Hours (per person)</label>
-        <input type="number" id="vol-hours" placeholder="e.g. 4" min="0" step="0.5">
-      </div>
-      <div class="form-group">
-        <label>Total Savings Value ($)</label>
-        <input type="number" id="vol-rate" placeholder="e.g. 500" min="0" step="1">
-      </div>
-      <div class="form-group">
-        <label>Notes / Task Description</label>
-        <input type="text" id="vol-notes" placeholder="e.g. Drywall, painting">
-      </div>
-      <div class="form-group" style="justify-content:flex-end;">
-        <button class="btn-primary" onclick="addVolEntry()">+ Log Day</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Volunteer Log -->
-  <div class="section-label">Volunteer Log</div>
+  <div class="section-label">Volunteer Contributions</div>
   <div class="log-section">
     <div class="log-toolbar">
-      <h2>All Entries</h2>
-      <div class="log-controls">
-        <input type="text" id="vol-search" placeholder="Search notes…" oninput="renderVolTable()" style="width:150px;">
-        <button class="btn-sm" onclick="exportVolCSV()">⬇ CSV</button>
-      </div>
+      <h2>All Contributions</h2>
     </div>
     <div id="vol-table-wrap"></div>
   </div>
@@ -1046,7 +1004,6 @@ function renderKPI() {
   var spent = totalSpent();
   var total = qboTotalBudget();
   var rem = total - spent;
-  var volHrs = volunteers.reduce(function(s,v){ return s+(v.people*v.hours); }, 0);
   var volSav = volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0);
   var elapsed = daysSinceStart(), totalDays = projectDaysTotal();
   var cards = [
@@ -1054,8 +1011,7 @@ function renderKPI() {
     {icon:'📊', label:'Total Spent',    value:fmt(spent),   sub:pct(spent,total)+'% used'},
     {icon:'💰', label:'Remaining',      value:fmt(rem),     sub:rem<0?'⚠ Over budget':'Available'},
     {icon:'⏱', label:'Time Elapsed',   value:Math.round(elapsed/totalDays*100)+'%', sub:Math.round(elapsed).toLocaleString()+' days'},
-    {icon:'👷', label:'Vol. Hours',     value:Math.round(volHrs).toLocaleString(), sub:'total contributed'},
-    {icon:'💵', label:'Vol. Savings',   value:fmt(volSav),  sub:'saved through volunteers'},
+    {icon:'💵', label:'Vol. Savings',   value:fmt(volSav),  sub:'saved through volunteers', hi:false},
   ];
   document.getElementById('kpi-grid').innerHTML = cards.map(function(c){
     return '<div class="kpi-card '+(c.hi?'highlight':'')+'"><div class="kpi-icon">'+c.icon+'</div><div class="kpi-label">'+c.label+'</div><div class="kpi-value">'+c.value+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
@@ -1292,11 +1248,15 @@ function showToast(msg){
 // ══════════════════════════════════════════
 // VOLUNTEER TRACKER
 // ══════════════════════════════════════════
-let volunteers = [];
+let volunteers = [
+  { notes: 'Leased Space Demolition', rate: 3000,  people: 33 },
+  { notes: 'Rough-In',                rate: 18000, people: 14 },
+  { notes: 'Framing, Drywall, & Ramp', rate: 20000, people: 34 },
+];
 let volDeleteIndex = null;
 
 function saveVol() {
-  if (!_dataLoaded) { console.warn('Save blocked — data not loaded yet.'); return; }
+  return; // volunteer data is static — no saving
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(function() {
     fetch('/api/data/bulk', {
@@ -1323,137 +1283,70 @@ function switchPage(page) {
   if (page === 'overview') renderOverview();
 }
 
-function totalVolHours() { return volunteers.reduce((s,v) => s + (v.people * v.hours), 0); }
-function totalVolSavings() { return volunteers.reduce((s,v) => s + (v.rate || 0), 0); }
+function totalVolHours() { return 0; } // removed - no longer tracked
+function totalVolSavings() { return volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0); }
 
 function renderVolKPI() {
-  const totalHrs = totalVolHours();
-  const totalSav = totalVolSavings();
-  const totalPeople = volunteers.reduce((s,v) => s + v.people, 0);
-  const totalDays = volunteers.length;
-  const cards = [
-    { icon:'🙌', label:'Total Volunteer Days', value: totalDays, sub:'days logged', hi:true },
-    { icon:'👥', label:'Total People', value: totalPeople.toLocaleString(), sub:'person appearances' },
-    { icon:'⏱', label:'Total Hours', value: totalHrs.toLocaleString('en-US',{maximumFractionDigits:1}), sub:'combined hours' },
-    { icon:'💵', label:'Value Saved', value: fmt(totalSav), sub:'est. labor value', hi:true },
+  var totalSav = totalVolSavings();
+  var totalEntries = volunteers.length;
+  var cards = [
+    { icon:'🙌', label:'Total Contributions', value: totalEntries, sub:'projects logged', hi:true },
+    { icon:'💵', label:'Total Value Saved', value: fmt(totalSav), sub:'saved through volunteers', hi:true },
   ];
-  document.getElementById('vol-kpi-grid').innerHTML = cards.map(c=>`
-    <div class="kpi-card ${c.hi?'highlight':''}">
-      <div class="kpi-icon">${c.icon}</div>
-      <div class="kpi-label">${c.label}</div>
-      <div class="kpi-value">${c.value}</div>
-      <div class="kpi-sub">${c.sub}</div>
-    </div>`).join('');
-}
-
-function renderVolMonthly() {
-  if (!volunteers.length) {
-    document.getElementById('vol-monthly-panel').innerHTML = '<div class="empty-state">No entries yet.</div>';
-    return;
-  }
-  const months = {};
-  volunteers.forEach(function(v) {
-    const d = new Date(v.date + 'T00:00:00');
-    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-    const label = MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
-    if (!months[key]) months[key] = { label:label, days:0, people:0, hours:0, savings:0 };
-    months[key].days++;
-    months[key].people += v.people;
-    months[key].hours += v.people * v.hours;
-    months[key].savings += (v.rate || 0);
-  });
-  const sorted = Object.keys(months).sort().map(function(k){ return months[k]; });
-  const maxHrs = Math.max.apply(null, sorted.map(function(m){ return m.hours; }));
-  document.getElementById('vol-monthly-panel').innerHTML = sorted.map(function(m) {
-    return '<div class="cat-row">' +
-      '<div class="cat-info">' +
-        '<span class="cat-name">' + m.label + '</span>' +
-        '<div style="display:flex;align-items:center;gap:14px;">' +
-          '<span class="cat-amounts">' + m.days + ' day' + (m.days!==1?'s':'') + ' &nbsp;·&nbsp; ' + m.people + ' people &nbsp;·&nbsp; ' + m.hours.toLocaleString('en-US',{maximumFractionDigits:1}) + ' hrs</span>' +
-          '<span style="font-weight:700;color:var(--green);font-size:.83rem;">' + fmt(m.savings) + ' saved</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + (maxHrs>0?Math.round(m.hours/maxHrs*100):0) + '%;background:var(--navy-light);"></div></div>' +
-    '</div>';
+  document.getElementById('vol-kpi-grid').innerHTML = cards.map(function(c){
+    return '<div class="kpi-card '+(c.hi?'highlight':'')+'"><div class="kpi-icon">'+c.icon+'</div><div class="kpi-label">'+c.label+'</div><div class="kpi-value">'+c.value+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
   }).join('');
 }
 
+function renderVolMonthly(){/* removed */}
+
 function renderVolTable() {
-  const search = document.getElementById('vol-search')?.value.toLowerCase() || '';
-  let filtered = volunteers.map(function(v,i){ return Object.assign({},v,{_idx:i}); }).filter(function(v) {
+  var search = '';
+  search = search.toLowerCase();
+  var filtered = volunteers.map(function(v,i){ return Object.assign({},v,{_idx:i}); }).filter(function(v){
     if (search && (v.notes||'').toLowerCase().indexOf(search) === -1) return false;
     return true;
   });
   if (!filtered.length) {
-    document.getElementById('vol-table-wrap').innerHTML = '<div class="empty-state">No entries found.</div>';
+    document.getElementById('vol-table-wrap').innerHTML = '<div class="empty-state">No contributions logged yet.</div>';
     return;
   }
-  const rows = filtered.map(function(v) {
-    const totalHrs = v.people * v.hours;
-    const valueSaved = (v.rate || 0);
-    const dateFmt = v.date.split('-').slice(1).concat(v.date.split('-')[0]).join('/');
-    return '<tr>' +
-      '<td>' + dateFmt + '</td>' +
-      '<td style="text-align:center;font-weight:700;color:var(--navy);">' + v.people + '</td>' +
-      '<td style="text-align:right;">' + v.hours.toLocaleString('en-US',{maximumFractionDigits:1}) + ' hrs</td>' +
-      '<td style="text-align:right;font-weight:700;color:var(--navy);">' + totalHrs.toLocaleString('en-US',{maximumFractionDigits:1}) + '</td>' +
-      '<td style="font-weight:700;color:var(--green);">' + fmt(valueSaved) + '</td>' +
-      '<td style="color:var(--text-muted);font-size:.82rem;">' + (v.notes||'—') + '</td>' +
-      '<td><button class="btn-icon" onclick="openVolDelModal(' + v._idx + ')">🗑</button></td>' +
-    '</tr>';
+  var rows = filtered.map(function(v){
+    return '<tr>'
+      + '<td style="font-weight:600;color:var(--navy);">' + (v.notes||'—') + '</td>'
+      + '<td style="text-align:center;color:var(--navy);font-weight:600;">' + (v.people||0) + '</td>'
+      + '<td style="text-align:right;font-weight:700;color:var(--green);font-size:1rem;">' + fmt(v.rate||0) + '</td>'
+      + ''
+      + '</tr>';
   }).join('');
+  var total = filtered.reduce(function(s,v){ return s+(v.rate||0); }, 0);
   document.getElementById('vol-table-wrap').innerHTML =
-    '<table>' +
-    '<thead><tr>' +
-      '<th>Date</th>' +
-      '<th style="text-align:center;"># People</th>' +
-      '<th style="text-align:right;">Hrs/Person</th>' +
-      '<th style="text-align:right;">Total Hrs</th>' +
-      '<th>Savings Value</th>' +
-      '<th>Notes</th>' +
-      '<th>Actions</th>' +
-    '</tr></thead>' +
-    '<tbody>' + rows + '</tbody>' +
-    '</table>';
+    '<table>'
+    + '<thead><tr><th>Project / Task</th><th style="text-align:center;">Volunteers</th><th style="text-align:right;">Savings Value</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody>'
+    + '<tfoot><tr style="background:var(--ice-pale);font-weight:700;"><td style="padding:10px 16px;">TOTAL</td><td style="text-align:center;padding:10px 16px;color:var(--navy);">' + volunteers.reduce(function(s,v){return s+(v.people||0);},0) + '</td><td style="text-align:right;padding:10px 16px;color:var(--green);">' + fmt(total) + '</td></tr></tfoot>'
+    + '</table>';
 }
 
-function addVolEntry() {
-  const date   = document.getElementById('vol-date').value;
-  const people = parseInt(document.getElementById('vol-people').value);
-  const hours  = parseFloat(document.getElementById('vol-hours').value);
-  const rate   = parseFloat(document.getElementById('vol-rate').value);
-  const notes  = document.getElementById('vol-notes').value.trim();
-  if (!date || isNaN(people) || people < 1 || isNaN(hours) || hours <= 0 || isNaN(rate) || rate < 0) {
-    showToast('Please fill in Date, # of Volunteers, and Hours.'); return;
-  }
-  volunteers.push({ date: date, people: people, hours: hours, rate: rate, notes: notes });
-  volunteers.sort(function(a,b){ return a.date < b.date ? 1 : -1; });
-  saveVol(); renderVolAll();
-  document.getElementById('vol-people').value = '';
-  document.getElementById('vol-hours').value = '';
-  document.getElementById('vol-notes').value = '';
-  showToast('Day logged!');
-}
+function addVolEntry(){ /* static data — no entry */ }
 
 function openVolDelModal(i)  { volDeleteIndex=i; document.getElementById('vol-del-modal').classList.add('open'); }
 function closeVolDelModal()  { volDeleteIndex=null; document.getElementById('vol-del-modal').classList.remove('open'); }
 function confirmVolDelete()  { if(volDeleteIndex!==null){volunteers.splice(volDeleteIndex,1);saveVol();renderVolAll();} closeVolDelModal(); showToast('Entry deleted.'); }
 
 function exportVolCSV() {
-  if (!volunteers.length) { showToast('No entries to export.'); return; }
-  const rows = ['Date,People,HoursPerPerson,TotalHours,SavingsValue,Notes'];
-  volunteers.forEach(function(v) {
-    const totalHrs = v.people * v.hours;
-    const valueSaved = (v.rate || 0).toFixed(2);
-    rows.push(v.date + ',' + v.people + ',' + v.hours + ',' + totalHrs + ',' + valueSaved + ',"' + (v.notes||'') + '"');
+  if (!volunteers.length) { showToast('No contributions to export.'); return; }
+  var rows = ['Project/Task,SavingsValue'];
+  volunteers.forEach(function(v){
+    rows.push('"'+(v.notes||'')+'",'+((v.rate||0).toFixed(2)));
   });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([rows.join('\n')], {type:'text/csv'}));
-  a.download = 'lifebridge_volunteers.csv';
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
+  a.download = 'lifebridge_volunteer_contributions.csv';
   a.click();
 }
 
-function renderVolAll() { renderVolKPI(); renderVolMonthly(); renderVolTable(); }
+function renderVolAll() { renderVolKPI(); renderVolTable(); }
 
 function exportDataJSON() {
   const btn = document.getElementById('pdf-btn');
@@ -2049,13 +1942,7 @@ function saveOverviewHighlight() {
   }, 300);
 }
 
-function getCurrentQuarterVolHours() {
-  var now = new Date();
-  var qStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
-  return volunteers.filter(function(v) {
-    return new Date(v.date + 'T00:00:00') >= qStart;
-  }).reduce(function(s, v) { return s + (v.people * v.hours); }, 0);
-}
+function getCurrentQuarterVolHours() { return 0; } // hours no longer tracked
 
 function getCurrentQuarterSavings() {
   var now = new Date();
@@ -2065,29 +1952,73 @@ function getCurrentQuarterSavings() {
   }).reduce(function(s, v) { return s + (v.rate || 0); }, 0);
 }
 
+// All 13 milestones across the 3 phases in chronological order
+var ALL_MILESTONES = [
+  {phase:0, year:2026, month:4,  label:'Apr'},
+  {phase:0, year:2026, month:5,  label:'May'},
+  {phase:0, year:2026, month:6,  label:'Jun'},
+  {phase:0, year:2026, month:8,  label:'Aug'},
+  {phase:0, year:2026, month:10, label:'Oct'},
+  {phase:1, year:2027, month:3,  label:'Mar'},
+  {phase:1, year:2027, month:6,  label:'Jun'},
+  {phase:1, year:2027, month:8,  label:'Aug'},
+  {phase:2, year:2028, month:1,  label:'Jan'},
+  {phase:2, year:2028, month:4,  label:'Apr'},
+  {phase:2, year:2028, month:6,  label:'Jun'},
+  {phase:2, year:2028, month:8,  label:'Aug'},
+  {phase:2, year:2028, month:10, label:'Oct'},
+];
+
 function getPhaseProgress() {
-  // Count phases that have any spending as "started"
-  // Use expenses as proxy for progress
-  var totalPhases = phases.length;
-  if (!totalPhases) return 0;
-  var ts = totalSpent();
-  var tb = TOTAL_BUDGET;
-  return tb > 0 ? Math.round(ts / tb * 100) : 0;
+  if (!window._qboUpdated) return 0;
+  var qboDate = new Date(window._qboUpdated);
+  var qboYear = qboDate.getFullYear();
+  var qboMonth = qboDate.getMonth() + 1; // 1-indexed
+  var completed = ALL_MILESTONES.filter(function(m) {
+    return m.year < qboYear || (m.year === qboYear && m.month <= qboMonth);
+  }).length;
+  return Math.round(completed / ALL_MILESTONES.length * 100);
+}
+
+function getMilestoneStatus(phaseIdx, milestoneMonth, milestoneYear) {
+  // Returns: 'completed', 'current', or 'upcoming'
+  if (!window._qboUpdated) return 'upcoming';
+  var qboDate = new Date(window._qboUpdated);
+  var qboYear = qboDate.getFullYear();
+  var qboMonth = qboDate.getMonth() + 1;
+  if (milestoneYear < qboYear || (milestoneYear === qboYear && milestoneMonth <= qboMonth)) {
+    return 'completed';
+  }
+  // Is it the next upcoming milestone?
+  var nextMs = ALL_MILESTONES.find(function(m) {
+    return m.year > qboYear || (m.year === qboYear && m.month > qboMonth);
+  });
+  if (nextMs && nextMs.phase === phaseIdx && nextMs.month === milestoneMonth && nextMs.year === milestoneYear) {
+    return 'current';
+  }
+  return 'upcoming';
 }
 
 function renderOverview() {
   var ts = totalSpent();
-  var qHours = getCurrentQuarterVolHours();
-  var qSavings = getCurrentQuarterSavings();
   var phasePct = getPhaseProgress();
+  var totalVolSav = volunteers.reduce(function(s,v){ return s+(v.rate||0); }, 0);
+  var totalVolPeople = volunteers.reduce(function(s,v){ return s+(v.people||0); }, 0);
 
   // Stat cards
-  var CARD_COLORS = ['#2b4560', '#c47f18', '#2a7a5a', '#c47f18'];
   var cards = [
-    { label: 'PHASE PROGRESS', value: phasePct + '%', sub: 'of total budget spent', color: '#2b4560' },
+    { label: 'PHASE PROGRESS', value: phasePct + '%', sub: (function(){
+        if (!window._qboUpdated) return 'no QBO data loaded';
+        var qboDate = new Date(window._qboUpdated);
+        var qboYear = qboDate.getFullYear();
+        var qboMonth = qboDate.getMonth() + 1;
+        var completed = ALL_MILESTONES.filter(function(m){ return m.year < qboYear || (m.year === qboYear && m.month <= qboMonth); }).length;
+        var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return completed + ' of 13 milestones · thru ' + monthNames[qboDate.getMonth()] + ' ' + qboYear;
+      })(), color: '#2b4560' },
     { label: 'SPENT TO DATE', value: fmt(ts), sub: 'of ' + fmt(TOTAL_BUDGET) + ' total project budget', color: '#c05f3c' },
-    { label: 'VOLUNTEER HOURS', value: Math.round(qHours).toLocaleString(), sub: 'contributed this quarter', color: '#2a7a5a' },
-    { label: 'ESTIMATED SAVINGS', value: fmt(qSavings), sub: 'saved through volunteer labor', color: '#c47f18' },
+    { label: 'TOTAL VOLUNTEERS', value: totalVolPeople.toLocaleString(), sub: 'contributed across all projects', color: '#2a7a5a' },
+    { label: 'VOLUNTEER SAVINGS', value: fmt(totalVolSav), sub: 'total saved through volunteers', color: '#c47f18' },
   ];
 
   document.getElementById('overview-cards').innerHTML = cards.map(function(c) {
@@ -2108,12 +2039,31 @@ function renderOverview() {
   var timelineHtml = phases.map(function(ph, i) {
     var color = phaseColors[i] || '#2b4560';
     var phSpent = phaseSpent(ph.id);
-    var phasePctDone = ph.budget > 0 ? Math.min(100, Math.round(phSpent / ph.budget * 100)) : 0;
+    // Calculate phase milestone completion based on QBO date
+    var phaseMilestones = ALL_MILESTONES.filter(function(m){ return m.phase === i; });
+    var phaseCompleted = 0;
+    if (window._qboUpdated) {
+      var qd = new Date(window._qboUpdated);
+      var qy = qd.getFullYear(), qm = qd.getMonth()+1;
+      phaseCompleted = phaseMilestones.filter(function(m){ return m.year < qy || (m.year === qy && m.month <= qm); }).length;
+    }
+    var phasePctDone = Math.round(phaseCompleted / phaseMilestones.length * 100);
     var dotYear = phaseYears[i];
     var dots = dotYear ? dotYear.months.map(function(m, di) {
-      var dotColor = di < Math.round(phasePctDone / 20) ? color : (i === 0 ? '#2b4560' : '#ccc');
+      // Map month label to month number
+      var monthMap = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+      var mNum = monthMap[m] || 1;
+      var status = getMilestoneStatus(i, mNum, dotYear.year);
+      var dotBg, dotBorder, dotSize;
+      if (status === 'completed') {
+        dotBg = color; dotBorder = color; dotSize = '14px';
+      } else if (status === 'current') {
+        dotBg = '#c47f18'; dotBorder = '#c47f18'; dotSize = '16px'; // amber = in progress
+      } else {
+        dotBg = 'transparent'; dotBorder = color; dotSize = '14px'; // hollow = upcoming
+      }
       return '<span style="display:inline-flex;flex-direction:column;align-items:center;gap:2px;">'
-        + '<span style="width:14px;height:14px;border-radius:50%;background:' + dotColor + ';border:2px solid ' + color + ';display:inline-block;"></span>'
+        + '<span style="width:'+dotSize+';height:'+dotSize+';border-radius:50%;background:'+dotBg+';border:2px solid '+dotBorder+';display:inline-block;"></span>'
         + '<span style="font-size:.62rem;color:var(--text-muted);">' + m + '</span>'
         + '</span>';
     }).join('') : '';
@@ -2262,8 +2212,8 @@ function renderPhaseSummaryTable() {
 function renderAll(){renderKPI();renderProgress();renderQBOBreakdown();renderPhaseSummaryTable();renderHealth();}
 
 // inp-date removed (QBO-driven budget)
-document.getElementById('vol-date').value=new Date().toISOString().slice(0,10);
-document.getElementById('vol-rate').value='';
+// vol-date removed
+// vol-rate removed
 
 // Load data from API then render
 
@@ -2275,22 +2225,14 @@ function initAuthMode() {
   if (IS_PUBLIC) {
     // Public view — hide admin tabs and sign out, show only overview
     document.querySelectorAll('.admin-tab').forEach(function(t){ t.style.display = 'none'; });
-    document.getElementById('notify-btn').style.display = 'none';
     document.getElementById('signout-btn').style.display = 'none';
     document.getElementById('pdf-btn').style.display = 'none';
     switchPage('overview');
   } else {
     // Authenticated admin
     IS_ADMIN = true;
-    document.getElementById('notify-btn').style.display = '';
-    document.getElementById('webhook-btn').style.display = '';
     document.getElementById('signout-btn').style.display = '';
     document.getElementById('admin-btn').style.display = 'none'; // hide admin login btn when already admin
-    // Load webhook URL
-    fetch('/api/settings', { credentials: 'include' })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ if (d.ok) document.getElementById('webhook-url-input').value = d.webhookUrl || ''; })
-      .catch(function(){});
   }
 }
 
