@@ -870,6 +870,7 @@ async function loadFromAPI() {
       if (d.data.lb_projects)     projects    = parseVal(d.data.lb_projects);
       // lb_volunteers intentionally skipped — data is hardcoded
       if (d.data.lb_qbo_data)          qboData              = parseVal(d.data.lb_qbo_data);
+      if (d.data.lb_completed_projects) completedProjects = parseVal(d.data.lb_completed_projects);
       if (d.data.lb_qbo_updated) {
         var rawDate = d.data.lb_qbo_updated;
         // Handle both plain string '2026-04-30' and JSON-encoded '"2026-04-30"'
@@ -1226,6 +1227,8 @@ function showToast(msg){
 // ══════════════════════════════════════════
 // VOLUNTEER TRACKER
 // ══════════════════════════════════════════
+var completedProjects = {}; // stores which project detail items are checked
+
 let volunteers = [
   { notes: 'Leased Space Demolition', rate: 3000  },
   { notes: 'Rough-In',                rate: 18000 },
@@ -2158,14 +2161,24 @@ function renderOverview() {
       tHtml += '<div style="display:flex;">';
       // Left column: projects list
       tHtml += '<div style="width:220px;flex-shrink:0;padding:4px 12px 10px 14px;border-left:3px solid '+ph.color+';margin-left:8px;">';
-      ph.projects.forEach(function(proj) {
+      ph.projects.forEach(function(proj, prIdx) {
         var projName = typeof proj === 'object' ? proj.name : proj;
         var projDetails = (typeof proj === 'object' && proj.details && proj.details.length) ? proj.details : [];
+        // Project name row (bold, with dot)
         tHtml += '<div style="padding:4px 14px 2px;font-size:.82rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;">';
         tHtml += '<span style="width:6px;height:6px;border-radius:50%;background:'+ph.color+';flex-shrink:0;display:inline-block;"></span>';
         tHtml += projName + '</div>';
-        projDetails.forEach(function(detail) {
-          tHtml += '<div style="padding:2px 14px 2px 30px;font-size:.76rem;color:var(--text-muted);">— ' + detail + '</div>';
+        // Detail items with checkboxes
+        projDetails.forEach(function(detail, dIdx) {
+          var key = 'ph'+pi+'_pr'+prIdx+'_d'+dIdx;
+          var checked = completedProjects[key] ? true : false;
+          var strikeStyle = checked ? 'text-decoration:line-through;color:#aaa;' : '';
+          tHtml += '<div style="padding:3px 14px 3px 28px;font-size:.78rem;display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="toggleProjectComplete(\''+key+'\')">';
+          tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?ph.color:'#ccc')+';background:'+(checked?ph.color:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
+          if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
+          tHtml += '</div>';
+          tHtml += '<span style="'+strikeStyle+'color:var(--text-muted);">' + detail + '</span>';
+          tHtml += '</div>';
         });
       });
       tHtml += '</div>';
@@ -2188,6 +2201,22 @@ function renderOverview() {
 // ── QBO-driven budget rendering ─────────────────────────────
 
 
+
+
+function saveCompletedProjects() {
+  if (!_dataLoaded) return;
+  fetch('/api/data/bulk', {
+    method: 'POST', credentials: 'include',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ data: { lb_completed_projects: JSON.stringify(completedProjects) }})
+  }).catch(function(e){ console.error('Save completed projects failed:', e); });
+}
+
+function toggleProjectComplete(key) {
+  completedProjects[key] = !completedProjects[key];
+  saveCompletedProjects();
+  renderOverview();
+}
 
 function toggleTimelinePhase(idx) {
   var body = document.getElementById('tl-projects-' + idx);
