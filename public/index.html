@@ -618,13 +618,12 @@
 
 <div class="nav-tabs" style="display:flex;justify-content:space-between;align-items:center;padding-right:20px;">
   <div style="display:flex;">
-    <button class="nav-tab" id="tab-overview" onclick="switchPage('overview')">Project Overview</button>
-    <button class="nav-tab active admin-tab" id="tab-budget" onclick="switchPage('budget')">Budget</button>
+    <button class="nav-tab active" id="tab-overview" onclick="switchPage('overview')">Project Overview</button>
+    <button class="nav-tab admin-tab" id="tab-budget" onclick="switchPage('budget')">Budget</button>
     <button class="nav-tab admin-tab" id="tab-volunteers" onclick="switchPage('volunteers')">Volunteers</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="save-indicator" style="font-size:.72rem;color:var(--ice);opacity:0;transition:opacity .4s;font-family:Montserrat,sans-serif;letter-spacing:.05em;"></span>
-    <button onclick="exportDataJSON()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;" title="Generate PDF Report" id="pdf-btn">⬇ PDF Report</button>
     <button onclick="openAdminLoginModal()" id="admin-btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;" id="admin-login-btn">⚙ Admin</button>
     <a href="/logout" id="signout-btn" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--ice);border-radius:6px;padding:5px 14px;font-family:Montserrat,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;text-decoration:none;">Sign Out</a>
   </div>
@@ -632,7 +631,7 @@
 
 <div class="container">
 
-<div class="page" id="page-overview">
+<div class="page active" id="page-overview">
 <div class="container">
 
   <!-- Header -->
@@ -656,7 +655,7 @@
 </div>
 </div><!-- /page-overview -->
 
-<div class="page active" id="page-budget">
+<div class="page" id="page-budget">
 
   <!-- QBO Update Banner -->
   <div id="qbo-banner" style="display:none;background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;border-radius:8px;padding:10px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:.85rem;">
@@ -1953,14 +1952,38 @@ var ALL_MILESTONES = [
 ];
 
 function getPhaseProgress() {
-  if (!window._qboUpdated) return 0;
-  var qboDate = new Date(window._qboUpdated);
-  var qboYear = qboDate.getFullYear();
-  var qboMonth = qboDate.getMonth() + 1; // 1-indexed
-  var completed = ALL_MILESTONES.filter(function(m) {
-    return m.year < qboYear || (m.year === qboYear && m.month <= qboMonth);
-  }).length;
-  return Math.round(completed / ALL_MILESTONES.length * 100);
+  // Calculate based on checked items in Phase 1 only (index 0)
+  if (typeof PHASE_SCHEDULE === 'undefined') return 0;
+  var ph = PHASE_SCHEDULE[0];
+  var totalItems = 0, checkedItems = 0;
+  (ph.projects || []).forEach(function(proj, prIdx) {
+    var details = (typeof proj === 'object' && proj.details) ? proj.details : [];
+    details.forEach(function(d, dIdx) {
+      totalItems++;
+      var key = 'ph0_pr'+prIdx+'_d'+dIdx;
+      if (completedProjects[key]) checkedItems++;
+    });
+  });
+  return totalItems > 0 ? Math.round(checkedItems / totalItems * 100) : 0;
+}
+
+function getCurrentPhaseNumber() {
+  // Returns which phase we're in based on checked items
+  if (typeof PHASE_SCHEDULE === 'undefined') return 1;
+  for (var pi = 0; pi < PHASE_SCHEDULE.length; pi++) {
+    var ph = PHASE_SCHEDULE[pi];
+    var phTotal = 0, phChecked = 0;
+    (ph.projects || []).forEach(function(proj, prIdx) {
+      var details = (typeof proj === 'object' && proj.details) ? proj.details : [];
+      details.forEach(function(d, dIdx) {
+        phTotal++;
+        if (completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx]) phChecked++;
+      });
+    });
+    // If this phase isn't fully checked, we're in it
+    if (phTotal === 0 || phChecked < phTotal) return pi + 1;
+  }
+  return PHASE_SCHEDULE.length;
 }
 
 function getMilestoneStatus(phaseIdx, milestoneMonth, milestoneYear) {
@@ -2008,11 +2031,7 @@ function renderOverview() {
         var qboYear = qboDate.getFullYear();
         var qboMonth = qboDate.getMonth() + 1;
         // Determine which phase we are currently in based on QBO date
-        var currentPhase = 1;
-        if (qboYear >= 2028) currentPhase = 3;
-        else if (qboYear >= 2027) currentPhase = 2;
-        else currentPhase = 1;
-        return 'Phase ' + currentPhase + ' of 3';
+        return 'Phase ' + getCurrentPhaseNumber() + ' of 3';
       })(), color: '#2b4560' },
     { label: 'SPENT TO DATE', value: fmt(ts), sub: 'of ' + fmt(TOTAL_BUDGET) + ' total project budget', color: '#c05f3c' },
     { label: 'TOTAL VOLUNTEERS', value: totalVolPeople.toLocaleString(), sub: 'contributed across all projects', color: '#2a7a5a' },
@@ -2027,164 +2046,86 @@ function renderOverview() {
       + '</div>';
   }).join('');
 
-  // ── Gantt Timeline ──────────────────────────────────────
-  var PHASE_SCHEDULE = [
-    { name: 'Phase 1: 473 Demo & Exterior Rebuild', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12,
-      projects: [
-        { name: 'Management & Planning', details: ['Plan Approval','Certified Survey w/Parcel Combination'] },
-        { name: 'Remodel Leased Space',  details: ['Leased Space Demo','Framing, Drywall, Ramp','Rough-In','Flooring','Wall Finishing, Misc. Finishing','Room Furnishings + AV',"MEP's + Bathroom Finishes + Kitchenette",'Rear Entry Door','Rear Entry Facade Cleanup'] },
-        { name: '473 Site Prep',         details: ['Move Utilities / Build New Utility Room','Exterior Wall Pre-Build','Construction Site Setup','Interior Demo','House + Site Demo, Haulaway','Exterior Roof + Wall Rebuild + Re-Roof','Footings','Drainage Install','Infill + Gravel','Concrete + Paver Patio'] },
-      ]
-    },
-    { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12,
-      projects: [
-        { name: 'Addition Shell',                            details: [] },
-        { name: 'Addition Mechanicals',                      details: [] },
-        { name: 'Addition Interior Finishing',               details: [] },
-        { name: 'Front Facade Finishing',                    details: [] },
-        { name: 'Rear Facade, Patio, Awning, & Walkway',    details: [] },
-        { name: 'Openings & 473 Space Remodeling',           details: [] },
-      ]
-    },
-    { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12,
-      projects: [
-        { name: 'Plan Approval',                                    details: [] },
-        { name: 'Move Bathrooms, Expand Lobby, & Security Doors',   details: [] },
-        { name: 'Conference Room, Cry Room, & Prayer Room',         details: [] },
-        { name: 'Open Up/Expand Worship Space',                     details: [] },
-        { name: 'Kitchen Storage Finishing',                        details: [] },
-      ]
-    },
-  ];
-
-  // Calendar spans Jan 2026 – Dec 2028 = 36 months total
-  var CAL_START_YEAR = 2026, CAL_START_MONTH = 1;
-  var TOTAL_MONTHS = 36;
-
-  function monthOffset(year, month) {
-    return (year - CAL_START_YEAR) * 12 + (month - CAL_START_MONTH);
-  }
-
-  // Current position marker based on QBO date
-  var nowOffset = -1;
-  if (window._qboUpdated) {
-    var nd = new Date(window._qboUpdated);
-    nowOffset = monthOffset(nd.getFullYear(), nd.getMonth() + 1);
-  }
-
-  var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var years = [2026, 2027, 2028];
-
-  // Build HTML
+  // ── Completion-based Timeline ───────────────────────────
+  var PHASE_COLORS = ['#2b4560', '#c05f3c', '#2a7a5a'];
   var tHtml = '';
 
-  // ── Year + Month header ──
-  tHtml += '<div style="display:flex;margin-bottom:4px;">';
-  tHtml += '<div style="width:220px;flex-shrink:0;"></div>';
-  tHtml += '<div style="flex:1;display:flex;">';
-  years.forEach(function(yr) {
-    tHtml += '<div style="flex:1;text-align:center;font-family:Montserrat,sans-serif;font-weight:800;font-size:.95rem;color:var(--navy);border-left:1px solid var(--border);padding-bottom:4px;">'+yr+'</div>';
-  });
-  tHtml += '</div></div>';
-
-  // Month labels row
-  tHtml += '<div style="display:flex;margin-bottom:12px;">';
-  tHtml += '<div style="width:220px;flex-shrink:0;"></div>';
-  tHtml += '<div style="flex:1;display:grid;grid-template-columns:repeat(36,1fr);">';
-  for (var mi = 0; mi < 36; mi++) {
-    var mLabel = MONTHS_SHORT[mi % 12];
-    var isJan = (mi % 12 === 0);
-    tHtml += '<div style="font-size:.55rem;color:var(--text-muted);text-align:center;border-left:'+(isJan?'2px solid var(--border)':'1px solid #eee')+';padding:1px 0;">'+mLabel+'</div>';
-  }
-  tHtml += '</div></div>';
-
-  // ── Phase rows ──
   PHASE_SCHEDULE.forEach(function(ph, pi) {
-    var startOff = monthOffset(ph.startYear, ph.startMonth);
-    var endOff   = monthOffset(ph.endYear,   ph.endMonth);
-    var spanMonths = endOff - startOff + 1;
+    var phColor = PHASE_COLORS[pi];
 
-    // Determine phase status
-    var phaseStatus, barColor, labelColor;
-    if (nowOffset < startOff) {
-      phaseStatus = 'Upcoming'; barColor = ph.color + '40'; labelColor = ph.color;
-    } else if (nowOffset <= endOff) {
-      phaseStatus = 'In Progress'; barColor = ph.color; labelColor = '#fff';
-    } else {
-      phaseStatus = 'Completed'; barColor = ph.color; labelColor = '#fff';
-    }
+    // Count total and checked items for this phase
+    var totalItems = 0, checkedItems = 0;
+    (ph.projects || []).forEach(function(proj, prIdx) {
+      var details = (typeof proj === 'object' && proj.details) ? proj.details : [];
+      details.forEach(function(d, dIdx) {
+        totalItems++;
+        if (completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx]) checkedItems++;
+      });
+    });
 
-    var shortName = ph.name.replace(/Phase \d+: /, '');
+    var pct = totalItems > 0 ? Math.round(checkedItems / totalItems * 100) : 0;
     var hasProjects = ph.projects && ph.projects.length > 0;
+    var shortName = ph.name.replace(/Phase \d+: /, '');
+    var status = checkedItems === 0 ? 'NOT STARTED' : checkedItems === totalItems ? 'COMPLETE' : 'IN PROGRESS';
+    var statusColor = status === 'COMPLETE' ? '#2a7a5a' : status === 'IN PROGRESS' ? '#c47f18' : '#6c757d';
 
-    tHtml += '<div style="margin-bottom:4px;">';
-    // Main row: label + bar
-    tHtml += '<div style="display:flex;align-items:center;">';
-    // Phase label with arrow on left
-    tHtml += '<div style="width:220px;flex-shrink:0;padding-right:12px;">';
-    tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:'+ph.color+';">Phase '+(pi+1)+'</div>';
-    tHtml += '<div style="display:flex;align-items:center;gap:5px;cursor:'+(hasProjects?'pointer':'default')+';" '+(hasProjects ? 'onclick="toggleTimelinePhase('+pi+')"' : '')+'>';
-    if (hasProjects) tHtml += '<span id="tl-arrow-'+pi+'" style="font-size:.55rem;color:'+ph.color+';transition:transform .2s;transform:rotate(-90deg);flex-shrink:0;">&#9660;</span>';
-    tHtml += '<span style="font-size:.82rem;font-weight:600;color:var(--navy-deep);line-height:1.2;">'+shortName+'</span>';
-    tHtml += '</div>';
-    tHtml += '</div>';
-    // Grid bar area
-    tHtml += '<div style="flex:1;position:relative;height:32px;">';
-    // Background grid lines
-    tHtml += '<div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);">';
-    tHtml += '<div style="border-left:2px solid var(--border);"></div>';
-    tHtml += '<div style="border-left:2px solid var(--border);"></div>';
-    tHtml += '<div style="border-left:2px solid var(--border);border-right:2px solid var(--border);"></div>';
-    tHtml += '</div>';
-    // Phase bar
-    var leftPct  = (startOff / TOTAL_MONTHS * 100).toFixed(2);
-    var widthPct = (spanMonths / TOTAL_MONTHS * 100).toFixed(2);
-    tHtml += '<div style="position:absolute;top:4px;bottom:4px;left:'+leftPct+'%;width:'+widthPct+'%;background:'+barColor+';border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;">';
-    tHtml += '<span style="font-size:.7rem;font-weight:700;color:'+labelColor+';font-family:Montserrat,sans-serif;white-space:nowrap;padding:0 8px;">'+phaseStatus+'</span>';
-    tHtml += '</div>';
-    // Progress fill overlay (completed portion)
-    if (nowOffset >= startOff && nowOffset <= endOff) {
-      var progressPct = ((nowOffset - startOff + 1) / spanMonths * 100).toFixed(2);
-      var progressWidth = (parseFloat(widthPct) * parseFloat(progressPct) / 100).toFixed(2);
-      tHtml += '<div style="position:absolute;top:4px;bottom:4px;left:'+leftPct+'%;width:'+progressWidth+'%;background:'+ph.color+';border-radius:6px 0 0 6px;opacity:.5;"></div>';
-    }
-    // "Today" marker
-    if (nowOffset >= 0 && nowOffset <= 35) {
-      var todayLeft = ((nowOffset + 0.5) / TOTAL_MONTHS * 100).toFixed(2);
-      tHtml += '<div style="position:absolute;top:0;bottom:0;left:'+todayLeft+'%;width:2px;background:#c47f18;z-index:2;"></div>';
-    }
+    tHtml += '<div style="margin-bottom:20px;">';
+
+    // Phase header row with arrow + title + status badge
+    tHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+    tHtml += '<div style="display:flex;align-items:center;gap:6px;cursor:'+(hasProjects?'pointer':'default')+'" '+(hasProjects?'onclick="toggleTimelinePhase('+pi+')"':'')+' >';
+    if (hasProjects) tHtml += '<span id="tl-arrow-'+pi+'" style="font-size:.55rem;color:'+phColor+';transition:transform .2s;transform:rotate(-90deg);">&#9660;</span>';
+    tHtml += '<div>';
+    tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:'+phColor+';">Phase '+(pi+1)+'</div>';
+    tHtml += '<div style="font-size:.9rem;font-weight:700;color:var(--navy-deep);">'+shortName+'</div>';
+    tHtml += '</div></div>';
+    // Right side: checked count + status badge
+    tHtml += '<div style="display:flex;align-items:center;gap:10px;">';
+    tHtml += '<span style="font-size:.8rem;color:var(--text-muted);">'+checkedItems+' / '+totalItems+' complete</span>';
+    tHtml += '<span style="background:'+statusColor+';color:#fff;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:4px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+status+'</span>';
     tHtml += '</div></div>';
 
-    // Projects dropdown — appears below the label only
+    // Progress bar
+    tHtml += '<div style="height:20px;background:#e8edf2;border-radius:10px;overflow:hidden;position:relative;">';
+    if (pct > 0) {
+      tHtml += '<div style="height:100%;width:'+pct+'%;background:'+phColor+';border-radius:10px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;">';
+      if (pct > 12) tHtml += '<span style="font-size:.68rem;font-weight:700;color:#fff;font-family:Montserrat,sans-serif;">'+pct+'%</span>';
+      tHtml += '</div>';
+    }
+    if (pct === 0) {
+      tHtml += '<div style="position:absolute;inset:0;display:flex;align-items:center;padding-left:10px;">';
+      tHtml += '<span style="font-size:.68rem;color:#aaa;font-family:Montserrat,sans-serif;">0%</span>';
+      tHtml += '</div>';
+    }
+    tHtml += '</div>';
+
+    // Projects dropdown
     if (hasProjects) {
       tHtml += '<div id="tl-projects-'+pi+'" style="display:none;">';
       tHtml += '<div style="display:flex;">';
-      // Left column: projects list
-      tHtml += '<div style="width:220px;flex-shrink:0;padding:4px 12px 10px 14px;border-left:3px solid '+ph.color+';margin-left:8px;">';
+      tHtml += '<div style="padding:8px 12px 10px 14px;border-left:3px solid '+phColor+';margin-left:8px;margin-top:8px;min-width:0;">';
       ph.projects.forEach(function(proj, prIdx) {
         var projName = typeof proj === 'object' ? proj.name : proj;
         var projDetails = (typeof proj === 'object' && proj.details && proj.details.length) ? proj.details : [];
-        // Project name row (bold, with dot)
-        tHtml += '<div style="padding:4px 14px 2px;font-size:.82rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;">';
-        tHtml += '<span style="width:6px;height:6px;border-radius:50%;background:'+ph.color+';flex-shrink:0;display:inline-block;"></span>';
+        tHtml += '<div style="padding:4px 0 2px;font-size:.82rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;">';
+        tHtml += '<span style="width:6px;height:6px;border-radius:50%;background:'+phColor+';flex-shrink:0;display:inline-block;"></span>';
         tHtml += projName + '</div>';
-        // Detail items with checkboxes
         projDetails.forEach(function(detail, dIdx) {
           var key = 'ph'+pi+'_pr'+prIdx+'_d'+dIdx;
           var checked = completedProjects[key] ? true : false;
           var strikeStyle = checked ? 'text-decoration:line-through;color:#aaa;' : '';
-          tHtml += '<div style="padding:3px 14px 3px 28px;font-size:.78rem;display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="toggleProjectComplete(\''+key+'\')">';
-          tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?ph.color:'#ccc')+';background:'+(checked?ph.color:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
+          tHtml += '<div style="padding:3px 14px 3px 14px;font-size:.78rem;display:flex;align-items:center;gap:8px;cursor:pointer;" data-key="'+key+'" onclick="handleCheckClick(this,event)">' + '';
+          tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?phColor:'#ccc')+';background:'+(checked?phColor:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
           if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
           tHtml += '</div>';
-          tHtml += '<span style="'+strikeStyle+'color:var(--text-muted);">' + detail + '</span>';
+          tHtml += '<span style="'+strikeStyle+'color:var(--text-muted);">'+detail+'</span>';
           tHtml += '</div>';
         });
       });
-      tHtml += '</div>';
-      tHtml += '</div></div>';
+      tHtml += '</div></div></div>';
     }
-    tHtml += '</div>'; // close outer
+
+    tHtml += '</div>'; // close phase block
   });
 
   document.getElementById('overview-timeline').innerHTML = tHtml;
@@ -2212,10 +2153,33 @@ function saveCompletedProjects() {
   }).catch(function(e){ console.error('Save completed projects failed:', e); });
 }
 
-function toggleProjectComplete(key) {
+function handleCheckClick(el, event) { toggleProjectComplete(el.getAttribute('data-key'), event); }
+function toggleProjectComplete(key, event) {
+  if (event) event.stopPropagation();
   completedProjects[key] = !completedProjects[key];
   saveCompletedProjects();
+  // Re-render only the timeline portion without collapsing
+  renderTimelineOnly();
+}
+
+
+function renderTimelineOnly() {
+  // Re-render just the timeline section preserving open/closed state
+  var openStates = {};
+  for (var i = 0; i < 3; i++) {
+    var el = document.getElementById('tl-projects-' + i);
+    if (el) openStates[i] = el.style.display !== 'none';
+  }
   renderOverview();
+  // Restore open/closed state
+  for (var i = 0; i < 3; i++) {
+    if (openStates[i]) {
+      var body = document.getElementById('tl-projects-' + i);
+      var arrow = document.getElementById('tl-arrow-' + i);
+      if (body) body.style.display = 'block';
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+  }
 }
 
 function toggleTimelinePhase(idx) {
@@ -2492,6 +2456,7 @@ loadFromAPI().then(function() {
       })
       .catch(function(e) { console.error('Public data load failed:', e); });
   } else {
+    switchPage('overview');
     renderAll();
     setProjectionMode(projectionMode);
     renderCategorySelects();
