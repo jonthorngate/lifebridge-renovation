@@ -1235,6 +1235,38 @@ let volunteers = [
 ];
 var TOTAL_UNIQUE_VOLUNTEERS = 68;
 var TOTAL_VOLUNTEER_SAVINGS = 41000;
+
+// ── Phase schedule & project details ────────────────────────
+var PHASE_SCHEDULE = [
+  { name: 'Phase 1: 473 Demo & Exterior Rebuild', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12,
+    projects: [
+      { name: 'Management & Planning', details: ['Plan Approval','Certified Survey w/Parcel Combination'] },
+      { name: 'Remodel Leased Space',  details: ['Leased Space Demo','Framing, Drywall, Ramp','Rough-In','Flooring','Wall Finishing, Misc. Finishing','Room Furnishings + AV',"MEP's + Bathroom Finishes + Kitchenette",'Rear Entry Door','Rear Entry Facade Cleanup'] },
+      { name: '473 Site Prep',         details: ['Move Utilities / Build New Utility Room','Exterior Wall Pre-Build','Construction Site Setup','Interior Demo','House + Site Demo, Haulaway','Exterior Roof + Wall Rebuild + Re-Roof','Footings','Drainage Install','Infill + Gravel','Concrete + Paver Patio'] },
+    ]
+  },
+  { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12,
+    projects: [
+      { name: 'Addition Shell',                         details: [] },
+      { name: 'Addition Mechanicals',                   details: [] },
+      { name: 'Addition Interior Finishing',            details: [] },
+      { name: 'Front Facade Finishing',                 details: [] },
+      { name: 'Rear Facade, Patio, Awning, & Walkway', details: [] },
+      { name: 'Openings & 473 Space Remodeling',        details: [] },
+    ]
+  },
+  { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12,
+    projects: [
+      { name: 'Plan Approval',                                  details: [] },
+      { name: 'Move Bathrooms, Expand Lobby, & Security Doors', details: [] },
+      { name: 'Conference Room, Cry Room, & Prayer Room',       details: [] },
+      { name: 'Open Up/Expand Worship Space',                   details: [] },
+      { name: 'Kitchen Storage Finishing',                      details: [] },
+    ]
+  },
+];
+
+
 let volDeleteIndex = null;
 
 function saveVol() {
