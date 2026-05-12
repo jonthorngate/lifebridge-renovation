@@ -2057,7 +2057,7 @@ function renderOverview() {
 
   // Stat cards
   var cards = [
-    { label: 'PROJECT PROGRESS', value: phasePct + '%', sub: (function(){
+    { label: 'PHASE PROGRESS', value: phasePct + '%', sub: (function(){
         if (!window._qboUpdated) return 'no QBO data loaded';
         var qboDate = new Date(window._qboUpdated);
         var qboYear = qboDate.getFullYear();
