@@ -610,7 +610,7 @@
     </div>
     <div class="header-text">
       <h1>LifeBridge Church</h1>
-      <p>Renovation Budget Tracker &nbsp;·&nbsp; $500,000 &nbsp;·&nbsp; 2026–2028</p>
+      <p>Renovation Budget Tracker &nbsp;·&nbsp; $550,000 &nbsp;·&nbsp; 2026–2028</p>
     </div>
   </div>
 
@@ -790,7 +790,7 @@ function loadJsPDF(callback) {
 }
 </script>
 <script>
-const TOTAL_BUDGET  = 500000;
+const TOTAL_BUDGET  = 550000;
 const PROJECT_START = new Date('2026-01-01');
 const PROJECT_END   = new Date('2028-12-31');
 
@@ -816,7 +816,7 @@ let subcatBudgets = {};
 let expenses = [];
 let qboData = []; // loaded from lb_qbo_data
 
-let yearBudgets = { 2026: 300000, 2027: 150000, 2028: 50000 };
+let yearBudgets = { 2026: 192500, 2027: 197500, 2028: 160000 };
 let deleteIndex = null;
 let chartInstance = null;
 
@@ -1120,7 +1120,7 @@ function updateYearBudgetTotal() {
     const v = parseFloat(document.getElementById('yrbud-'+yr)?.value||0);
     return s + (isNaN(v)?0:v);
   }, 0);
-  document.getElementById('yearbud-total').textContent = fmt(total) + (Math.abs(total-TOTAL_BUDGET)>1?' — ⚠ should equal $500,000':'');
+  document.getElementById('yearbud-total').textContent = fmt(total) + (Math.abs(total-TOTAL_BUDGET)>1?' — ⚠ should equal $550,000':'');
 }
 function saveYearBudgets() {
   [2026,2027,2028].forEach(yr => {
@@ -1238,30 +1238,38 @@ var TOTAL_VOLUNTEER_SAVINGS = 41000;
 
 // ── Phase schedule & project details ────────────────────────
 var PHASE_SCHEDULE = [
-  { name: 'Phase 1: 473 Demo & Exterior Rebuild', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12,
+  { name: 'Phase 1: Planning, 473 Demo, Exterior Rebuild & Leased Space', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12, budget: 192500,
     projects: [
-      { name: 'Management & Planning', details: ['Plan Approval','Certified Survey w/Parcel Combination'] },
-      { name: 'Remodel Leased Space',  details: ['Leased Space Demo','Framing, Drywall, Ramp','Rough-In','Flooring','Wall Finishing, Misc. Finishing','Room Furnishings + AV',"MEP's + Bathroom Finishes + Kitchenette",'Rear Entry Door','Rear Entry Facade Cleanup'] },
-      { name: '473 Site Prep',         details: ['Move Utilities / Build New Utility Room','Exterior Wall Pre-Build','Construction Site Setup','Interior Demo','House + Site Demo, Haulaway','Exterior Roof + Wall Rebuild + Re-Roof','Footings','Drainage Install','Infill + Gravel','Concrete + Paver Patio'] },
+      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 10000, market: 20000, details: [] },
+      { name: 'Leased Space Mechanicals',               deadline: '6/30/2026', budget: 18000, market: 30000, details: [] },
+      { name: 'Leased Space Finishing',                 deadline: '8/15/2026', budget: 25000, market: 50000, details: [] },
+      { name: '473 Site Work + Utilities',              deadline: '8/31/2026', budget: 29000, market: 40000, details: [] },
+      { name: '473 Rear Demo + Exterior Rebuild',       deadline: '10/15/2026', budget: 39500, market: 45000, details: [] },
+      { name: 'Covered Walkway + Patio Finishing',      deadline: '12/15/2026', budget: 18500, market: 20000, details: [] },
+      { name: 'Admin & Management',                     deadline: '', budget: 39500, market: 60000, details: [] },
+      { name: '7% Contingency',                         deadline: '', budget: 13000, market: 22525, details: [] },
     ]
   },
-  { name: 'Phase 2: Connecting Addition & 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12,
+  { name: 'Phase 2: Connecting Addition + 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12, budget: 197500,
     projects: [
-      { name: 'Addition Shell',                         details: [] },
-      { name: 'Addition Mechanicals',                   details: [] },
-      { name: 'Addition Interior Finishing',            details: [] },
-      { name: 'Front Facade Finishing',                 details: [] },
-      { name: 'Rear Facade, Patio, Awning, & Walkway', details: [] },
-      { name: 'Openings & 473 Space Remodeling',        details: [] },
+      { name: 'Addition Shell',                  deadline: '3/31/2027', budget: 55000, market: 65000, details: [] },
+      { name: 'Addition Mechanicals',            deadline: '6/30/2027', budget: 27000, market: 30000, details: [] },
+      { name: 'Addition Interior Finishing',     deadline: '7/31/2027', budget: 20000, market: 30000, details: [] },
+      { name: 'Openings + Existing Space Remodel', deadline: '8/31/2027', budget: 27000, market: 35000, details: [] },
+      { name: 'Facade Finishing',                deadline: '10/31/2027', budget: 27500, market: 30000, details: [] },
+      { name: 'Admin & Management',              deadline: '', budget: 28000, market: 40000, details: [] },
+      { name: '7% Contingency',                  deadline: '', budget: 13000, market: 19550, details: [] },
     ]
   },
-  { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12,
+  { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12, budget: 160000,
     projects: [
-      { name: 'Plan Approval',                                  details: [] },
-      { name: 'Move Bathrooms, Expand Lobby, & Security Doors', details: [] },
-      { name: 'Conference Room, Cry Room, & Prayer Room',       details: [] },
-      { name: 'Open Up/Expand Worship Space',                   details: [] },
-      { name: 'Kitchen Storage Finishing',                      details: [] },
+      { name: 'Move Bathrooms',                   deadline: '3/31/2028', budget: 27000, market: 40000, details: [] },
+      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 24000, market: 32500, details: [] },
+      { name: 'Cry Room + Prayer Room',            deadline: '6/30/2028', budget: 21000, market: 30000, details: [] },
+      { name: 'Open Up/Expand Worship Space',      deadline: '9/30/2028', budget: 35000, market: 50000, details: [] },
+      { name: 'Conference Room',                   deadline: '12/15/2028', budget: 14000, market: 25000, details: [] },
+      { name: 'Admin & Management',                deadline: '', budget: 28000, market: 40000, details: [] },
+      { name: '7% Contingency',                    deadline: '', budget: 11000, market: 16313, details: [] },
     ]
   },
 ];
@@ -1914,7 +1922,7 @@ function updatePhaseBudgetTotal() {
     if (el) { var v = parseFloat(el.value||0); total += isNaN(v)?0:v; }
   });
   var el = document.getElementById('phase-budget-grand-total');
-  if (el) el.textContent = fmt(total) + (Math.abs(total-TOTAL_BUDGET)>1?' — ⚠ should equal $500,000':'');
+  if (el) el.textContent = fmt(total) + (Math.abs(total-TOTAL_BUDGET)>1?' — ⚠ should equal $550,000':'');
 }
 
 function savePhaseBudgets() {
