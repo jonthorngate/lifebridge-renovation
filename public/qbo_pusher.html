@@ -4,75 +4,65 @@
   <meta charset="UTF-8">
   <title>LifeBridge QBO Data Pusher</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; background: #f5f7fa; }
+    body { font-family: Arial, sans-serif; max-width: 620px; margin: 60px auto; padding: 20px; background: #f5f7fa; }
     .card { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
     h2 { color: #1e3c72; margin-bottom: 6px; }
-    p { color: #666; font-size: .9rem; margin-bottom: 24px; }
+    p { color: #666; font-size: .9rem; margin-bottom: 20px; }
     button { background: #1e3c72; color: white; border: none; padding: 12px 28px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; }
     button:hover { background: #2a5298; }
     button:disabled { background: #aaa; cursor: not-allowed; }
     #status { margin-top: 20px; padding: 14px; border-radius: 8px; font-size: .9rem; display: none; }
     .success { background: #d4edda; color: #155724; }
     .error { background: #f8d7da; color: #721c24; }
-    .summary { margin-top: 20px; font-size: .85rem; color: #444; background: #f0f4ff; padding: 14px; border-radius: 8px; line-height: 1.8; }
+    .summary { margin-top: 16px; font-size: .84rem; color: #444; background: #f0f4ff; padding: 16px; border-radius: 8px; line-height: 2; }
     .summary b { color: #1e3c72; }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>LifeBridge QBO Data Pusher</h2>
-    <p>This will update the tracker with data from the <b>July 2025 – April 30, 2026</b> QBO report and clear all previous budget data.</p>
+    <p>Updates the tracker with the latest QBO report data (through <b>April 30, 2026</b>).</p>
     <div class="summary">
-      <b>Data being pushed:</b><br>
-      • Phase 1 - 473 Demo & Exterior Rebuild: <b>$22,907.68 spent</b><br>
-      &nbsp;&nbsp;– Management & Planning › Admin/Mgmt: $7,923.82<br>
-      &nbsp;&nbsp;– Remodel Leased Space › Labor: $961.75<br>
-      &nbsp;&nbsp;– Remodel Leased Space › Materials: $11,877.61<br>
-      &nbsp;&nbsp;– Remodel Leased Space › Admin/Mgmt: $2,144.50<br>
-      • Phase 2 & Phase 3: $0 (no spend yet)<br>
-      • Report date: <b>April 30, 2026</b><br>
-      • Year budgets: 2026: $170,078 | 2027: $189,957 | 2028: $139,965
+      <b>Phase 1 — $22,907.68 spent of $192,500 budget</b><br>
+      &nbsp;&nbsp;Management & Planning › Admin/Mgmt: $7,923.82<br>
+      &nbsp;&nbsp;Remodel Leased Space › Labor: $961.75<br>
+      &nbsp;&nbsp;Remodel Leased Space › Materials: $11,877.61<br>
+      &nbsp;&nbsp;Remodel Leased Space › Admin/Mgmt: $2,144.50<br>
+      <b>Phase 2 & 3:</b> $0 (no spend yet)<br>
+      <b>Year budgets:</b> 2026: $192,500 · 2027: $197,500 · 2028: $160,000<br>
+      <b>Total project budget:</b> $550,000
     </div>
     <br>
     <button onclick="pushData()" id="push-btn">Push QBO Data to Tracker</button>
     <div id="status"></div>
   </div>
-
   <script>
     const payload = {
-  "lb_qbo_data": "[{\"account\": \"1000\", \"name\": \"Phase 1 - 473 Demo & Exterior Rebuild\", \"budget\": 170078, \"projects\": [{\"account\": \"1100\", \"name\": \"Management & Planning\", \"budget\": 10000, \"subcats\": [{\"account\": \"1104\", \"name\": \"Admin / Management\", \"spent\": 7923.82}], \"spent\": 7923.82}, {\"account\": \"1200\", \"name\": \"Remodel Leased Space\", \"budget\": 32500, \"subcats\": [{\"account\": \"1201\", \"name\": \"Labor\", \"spent\": 961.75}, {\"account\": \"1202\", \"name\": \"Materials\", \"spent\": 11877.61}, {\"account\": \"1203\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"1204\", \"name\": \"Admin / Management\", \"spent\": 2144.5}], \"spent\": 14983.86}, {\"account\": \"1300\", \"name\": \"473 Site Prep\", \"budget\": 116800, \"subcats\": [{\"account\": \"1301\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"1302\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"1303\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"1304\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}], \"spent\": 22907.68}, {\"account\": \"2000\", \"name\": \"Phase 2 - Connecting Addition & 473 Remodel\", \"budget\": 189957, \"projects\": [{\"account\": \"2100\", \"name\": \"Addition Shell\", \"budget\": 53000, \"subcats\": [{\"account\": \"2101\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"2102\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"2104\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"2200\", \"name\": \"Addition Mechanicals\", \"budget\": 30000, \"subcats\": [{\"account\": \"2203\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"2204\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"2300\", \"name\": \"Addition Interior Finishing\", \"budget\": 18500, \"subcats\": [{\"account\": \"2301\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"2302\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"2304\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"2400\", \"name\": \"Front Facade Finishing\", \"budget\": 26000, \"subcats\": [{\"account\": \"2401\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"2402\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"2403\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"2404\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"2500\", \"name\": \"Rear Facade, Patio, Awning, & Walkway\", \"budget\": 30576, \"subcats\": [{\"account\": \"2501\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"2502\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"2503\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"2504\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"2600\", \"name\": \"Openings & 473 Space Remodeling\", \"budget\": 17000, \"subcats\": [{\"account\": \"2601\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"2602\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"2603\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"2604\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"3000\", \"name\": \"Phase 3 - Remodel Church Building\", \"budget\": 139965, \"projects\": [{\"account\": \"3100\", \"name\": \"Plan Approval\", \"budget\": 7500, \"subcats\": [{\"account\": \"3104\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"3200\", \"name\": \"Move Bathrooms, Expand Lobby, & Security Doors\", \"budget\": 48000, \"subcats\": [{\"account\": \"3201\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"3202\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"3203\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"3204\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"3300\", \"name\": \"Conference Room, Cry Room, & Prayer Room\", \"budget\": 36000, \"subcats\": [{\"account\": \"3301\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"3302\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"3303\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"3304\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"3400\", \"name\": \"Open Up/Expand Worship Space\", \"budget\": 23500, \"subcats\": [{\"account\": \"3401\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"3402\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"3403\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"3404\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}, {\"account\": \"3500\", \"name\": \"Kitchen Storage Finishing\", \"budget\": 14000, \"subcats\": [{\"account\": \"3501\", \"name\": \"Labor\", \"spent\": 0.0}, {\"account\": \"3502\", \"name\": \"Materials\", \"spent\": 0.0}, {\"account\": \"3503\", \"name\": \"Mechanicals\", \"spent\": 0.0}, {\"account\": \"3504\", \"name\": \"Admin / Management\", \"spent\": 0.0}], \"spent\": 0.0}], \"spent\": 0.0}]",
-  "lb_year_budgets": "{\"2026\": 170078, \"2027\": 189957, \"2028\": 139965}",
+  "lb_qbo_data": "[{\"account\": \"1000\", \"name\": \"Phase 1 - Planning, 473 Demo, Exterior Rebuild & Leased Space\", \"budget\": 192500, \"spent\": 22907.68, \"projects\": [{\"account\": \"1100\", \"name\": \"Management & Planning\", \"budget\": 10000, \"spent\": 7923.82, \"subcats\": [{\"account\": \"1104\", \"name\": \"Admin / Management\", \"spent\": 7923.82}]}, {\"account\": \"1200\", \"name\": \"Remodel Leased Space\", \"budget\": 32500, \"spent\": 14983.86, \"subcats\": [{\"account\": \"1201\", \"name\": \"Labor\", \"spent\": 961.75}, {\"account\": \"1202\", \"name\": \"Materials\", \"spent\": 11877.61}, {\"account\": \"1204\", \"name\": \"Admin / Management\", \"spent\": 2144.5}]}, {\"account\": \"1300\", \"name\": \"473 Site Prep\", \"budget\": 116800, \"spent\": 0, \"subcats\": []}]}, {\"account\": \"2000\", \"name\": \"Phase 2 - Connecting Addition + 473 Remodel\", \"budget\": 197500, \"spent\": 0, \"projects\": [{\"account\": \"2100\", \"name\": \"Addition Shell\", \"budget\": 55000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2200\", \"name\": \"Addition Mechanicals\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2300\", \"name\": \"Addition Interior Finishing\", \"budget\": 20000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2600\", \"name\": \"Openings & 473 Space Remodeling\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2400\", \"name\": \"Facade Finishing\", \"budget\": 27500, \"spent\": 0, \"subcats\": []}]}, {\"account\": \"3000\", \"name\": \"Phase 3 - Remodel Church Building\", \"budget\": 160000, \"spent\": 0, \"projects\": [{\"account\": \"3200\", \"name\": \"Move Bathrooms\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3300\", \"name\": \"Expand Lobby + Add Security Doors\", \"budget\": 24000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3400\", \"name\": \"Cry Room + Prayer Room\", \"budget\": 21000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3500\", \"name\": \"Open Up/Expand Worship Space\", \"budget\": 35000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3600\", \"name\": \"Conference Room\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}]}]",
+  "lb_year_budgets": "{\"2026\": 192500, \"2027\": 197500, \"2028\": 160000}",
   "lb_expenses2": "[]",
-  "lb_qbo_updated": "2026-04-30"
+  "lb_qbo_updated": "2026-04-30T12:00:00"
 };
-
     async function pushData() {
       const btn = document.getElementById('push-btn');
       const statusEl = document.getElementById('status');
-      btn.disabled = true;
-      btn.textContent = 'Pushing...';
-      statusEl.style.display = 'none';
-
+      btn.disabled = true; btn.textContent = 'Pushing...'; statusEl.style.display = 'none';
       try {
         const r = await fetch('/api/data/bulk', {
-          method: 'POST',
-          credentials: 'include',
+          method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ data: payload })
         });
         const d = await r.json();
         if (d.ok) {
           statusEl.className = 'success';
-          statusEl.innerHTML = '✓ Data pushed successfully! The tracker now shows data as of <b>April 30, 2026</b>.<br><br><a href="/" style="color:#155724;font-weight:600;">Go to tracker →</a>';
+          statusEl.innerHTML = '✓ Data pushed successfully!<br><br><a href="/" style="color:#155724;font-weight:600;">Go to tracker →</a>';
           btn.textContent = 'Done ✓';
-        } else {
-          throw new Error(d.error || 'Unknown error');
-        }
+        } else throw new Error(d.error || 'Unknown error');
       } catch(e) {
         statusEl.className = 'error';
         statusEl.textContent = '✗ Error: ' + e.message + '. Make sure you are logged in first.';
-        btn.disabled = false;
-        btn.textContent = 'Push QBO Data to Tracker';
+        btn.disabled = false; btn.textContent = 'Push QBO Data to Tracker';
       }
       statusEl.style.display = 'block';
     }
