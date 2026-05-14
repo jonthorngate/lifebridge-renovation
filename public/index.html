@@ -1240,36 +1240,155 @@ var TOTAL_VOLUNTEER_SAVINGS = 41000;
 var PHASE_SCHEDULE = [
   { name: 'Phase 1: Planning, 473 Demo, Exterior Rebuild & Leased Space', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12, budget: 192500,
     projects: [
-      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 10000, market: 20000, details: [] },
-      { name: 'Leased Space Mechanicals',               deadline: '6/30/2026', budget: 18000, market: 30000, details: [] },
-      { name: 'Leased Space Finishing',                 deadline: '8/15/2026', budget: 25000, market: 50000, details: [] },
-      { name: '473 Site Work + Utilities',              deadline: '8/31/2026', budget: 29000, market: 40000, details: [] },
-      { name: '473 Rear Demo + Exterior Rebuild',       deadline: '10/15/2026', budget: 39500, market: 45000, details: [] },
-      { name: 'Covered Walkway + Patio Finishing',      deadline: '12/15/2026', budget: 18500, market: 20000, details: [] },
-      { name: 'Admin & Management',                     deadline: '', budget: 39500, market: 60000, details: [] },
-      { name: '7% Contingency',                         deadline: '', budget: 13000, market: 22525, details: [] },
+      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 10000, details: [
+          'Demo & Misc. — $2,000',
+          'Framing for New Walls + Layout — $2,500',
+          'Drywall — Hang, Tape, Sand — $5,500',
+        ]
+      },
+      { name: 'Leased Space Mechanicals', deadline: '6/30/2026', budget: 17000, details: [
+          'Plumbing — Bathroom + Kitchenette — $10,000',
+          'Electrical + Low Voltage — $3,000',
+          'HVAC — Moving for Layout — $4,000',
+        ]
+      },
+      { name: 'Leased Space Finishing', deadline: '8/15/2026', budget: 26000, details: [
+          'Flooring (carpet tile, wood, polished concrete) — $5,000',
+          'Painting — $2,000',
+          'Room Furnishings + AV — $5,000',
+          'Window + Door — $4,000',
+          'Finish Construction - Ramp, Alcove, Office Wall, Island, Trim — $10,000',
+        ]
+      },
+      { name: '473 Site Work + Utilities', deadline: '8/31/2026', budget: 29000, details: [
+          'Move Utilities + New Furnace — $14,000',
+          'Footings (perimeter, 48" deep) — $8,000',
+          'Drainage Install + Storm Tie-in — $3,500',
+          'Excavating, Backfill, Compacted Gravel — $3,500',
+        ]
+      },
+      { name: '473 Rear Demo + Exterior Rebuild', deadline: '10/15/2026', budget: 39500, details: [
+          'House + Site Demo, Haulaway — $10,000',
+          'Rebuild Back Roof, Wall + Stairwell Landing, Re-Roof — $25,000',
+          'Rear Facade — $4,500',
+        ]
+      },
+      { name: 'Covered Walkway + Patio Finishing', deadline: '12/15/2026', budget: 18500, details: [
+          'Covered Walkway + Awnings + Privacy Fence — $10,000',
+          'Concrete Finishing + Pavers (Patio) — $3,500',
+          'Rear Exterior Lighting — $1,500',
+          'Outdoor Furnishings (tables, fire pit) — $3,500',
+        ]
+      },
+      { name: 'Admin & Management', deadline: '', budget: 39500, details: [
+          'Project Planning, Design & Management — $32,000',
+          'Approvals and Permits — $5,000',
+          'Insurance, Safety & Misc — $2,500',
+        ]
+      },
+      { name: 'Contingency', deadline: '', budget: 13000, details: [] },
     ]
   },
   { name: 'Phase 2: Connecting Addition + 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12, budget: 197500,
     projects: [
-      { name: 'Addition Shell',                  deadline: '3/31/2027', budget: 55000, market: 65000, details: [] },
-      { name: 'Addition Mechanicals',            deadline: '6/30/2027', budget: 27000, market: 30000, details: [] },
-      { name: 'Addition Interior Finishing',     deadline: '7/31/2027', budget: 20000, market: 30000, details: [] },
-      { name: 'Openings + Existing Space Remodel', deadline: '8/31/2027', budget: 27000, market: 35000, details: [] },
-      { name: 'Facade Finishing',                deadline: '10/31/2027', budget: 27500, market: 30000, details: [] },
-      { name: 'Admin & Management',              deadline: '', budget: 28000, market: 40000, details: [] },
-      { name: '7% Contingency',                  deadline: '', budget: 13000, market: 19550, details: [] },
+      { name: 'Addition Shell', deadline: '3/31/2027', budget: 55000, details: [
+          'Wall + Ceiling Structure (steel studs + truss) — $15,000',
+          'Roof Decking, Insulation, Membrane (TPO) — $18,000',
+          'Rear Facade (Addition Only) — brick + paneling — $15,000',
+          'Alley Walls (fire-separated) — $4,000',
+          'Concrete Slab + Combine Closet — $3,000',
+        ]
+      },
+      { name: 'Addition Mechanicals', deadline: '6/30/2027', budget: 27000, details: [
+          'Furnace + Condenser Install — $11,000',
+          'Ducting (addition + nursery + wiggle room) — $4,000',
+          'Sprinkler Extension + Gas Piping — $5,000',
+          'Lighting Circuit + Receptacles + Fixtures — $4,000',
+          'Smoke / CO / Fire Alarm + Data / Security / AV — $3,000',
+        ]
+      },
+      { name: 'Addition Interior Finishing', deadline: '6/30/2027', budget: 20000, details: [
+          'Drywall — $6,000',
+          'Doors and Finishing — $5,000',
+          'Floor Finishing (sealed concrete) — $4,000',
+          'Ceiling (paint metal deck) — $2,000',
+          'Furnishings (checkin, basic AV) — $3,000',
+        ]
+      },
+      { name: 'Openings + 473 Existing Space Remodeling', deadline: '8/31/2027', budget: 27000, details: [
+          'Rear Facade Brick Veneer + Paneling (existing 473) — $8,000',
+          'Misc. Finishing (move wall, paint, etc.) — $7,000',
+          'New Door Install (security) — $5,000',
+          'Cut 42" Opening + Lintel Install — $4,000',
+          'Move Electrical and Gas Lines — $3,000',
+        ]
+      },
+      { name: 'Facade Finishing', deadline: '10/31/2027', budget: 27500, details: [
+          'Addition Double Door / Storefront System — $11,000',
+          'Lower Facade Brick Veneer — $6,000',
+          'Paneling or Stucco — $3,500',
+          'New Awnings (fabricate + install) — $5,000',
+          'New Lighting + Demo Existing Awning — $2,000',
+        ]
+      },
+      { name: 'Admin & Management', deadline: '', budget: 28000, details: [
+          'Plan Approval + Permits — $2,000',
+          'Project Planning, Design & Management — $24,000',
+          'Insurance + Misc Admin — $2,000',
+        ]
+      },
+      { name: 'Contingency', deadline: '', budget: 13000, details: [] },
     ]
   },
   { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12, budget: 160000,
     projects: [
-      { name: 'Move Bathrooms',                   deadline: '3/31/2028', budget: 27000, market: 40000, details: [] },
-      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 24000, market: 32500, details: [] },
-      { name: 'Cry Room + Prayer Room',            deadline: '6/30/2028', budget: 21000, market: 30000, details: [] },
-      { name: 'Open Up/Expand Worship Space',      deadline: '9/30/2028', budget: 35000, market: 50000, details: [] },
-      { name: 'Conference Room',                   deadline: '12/15/2028', budget: 14000, market: 25000, details: [] },
-      { name: 'Admin & Management',                deadline: '', budget: 28000, market: 40000, details: [] },
-      { name: '7% Contingency',                    deadline: '', budget: 11000, market: 16313, details: [] },
+      { name: 'Move Bathrooms', deadline: '3/31/2028', budget: 27000, details: [
+          'Move Plumbing + Finishes — $7,000',
+          'Flooring + Replace Ceiling Tiles — $5,500',
+          'Demo + Framing, Drywall, Paint + HVAC Re-work — $7,500',
+          'Door Moving, Installs — $4,000',
+          'Electrical — $3,000',
+        ]
+      },
+      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 24000, details: [
+          'Hallway Security Doors + Glass Surround — $9,000',
+          'Convert Ceiling to Drywall (matched w/ hallway) — $4,000',
+          'Flooring (tile or other) — $4,000',
+          'Wall Finishing — $4,000',
+          'Finishing (trim, paint, misc.) — $3,000',
+        ]
+      },
+      { name: 'Cry Room + Prayer Room', deadline: '6/30/2028', budget: 21000, details: [
+          'New Back Wall / Glass Patio Accordion Door — $8,500',
+          'Nap Room + Wall Soundproofing — $4,500',
+          'Drywall + Paint + Move Doors — $4,000',
+          'Cry Room Window Install — $2,000',
+          'Sound into Cry/Nursing Areas + AV — $2,000',
+        ]
+      },
+      { name: 'Open Up/Expand Worship Space', deadline: '9/30/2028', budget: 35000, details: [
+          'Raise/Re-work Ceiling + Drywall (back wall) — $20,000',
+          'Rework Flooring along new back wall — $3,500',
+          'Mechanical Reworking + Ducting — $4,000',
+          'AV Reworking + Sound Baffles — $5,000',
+          'Demo + Misc Finishing — $2,500',
+        ]
+      },
+      { name: 'Conference Room', deadline: '12/15/2028', budget: 14000, details: [
+          'Doors — $3,500',
+          'Flooring, Wall, Ceiling Finishing — $3,000',
+          'Furnishing Buildout — $3,000',
+          'Add 1 Large Window — $2,500',
+          'Add/Rework HVAC and Electrical — $2,000',
+        ]
+      },
+      { name: 'Admin & Management', deadline: '', budget: 28000, details: [
+          'Plan Approval + Permits — $2,000',
+          'Project Planning, Design & Management — $24,000',
+          'Insurance + Misc Admin — $2,000',
+        ]
+      },
+      { name: 'Contingency', deadline: '', budget: 11000, details: [] },
     ]
   },
 ];
