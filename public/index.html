@@ -2195,7 +2195,7 @@ function renderOverview() {
       })(), color: '#2b4560' },
     { label: 'SPENT TO DATE', value: fmt(ts), sub: 'of ' + fmt(TOTAL_BUDGET) + ' total project budget', color: '#c05f3c' },
     { label: 'TOTAL VOLUNTEERS', value: totalVolPeople.toLocaleString(), sub: 'contributed across all projects', color: '#2a7a5a' },
-    { label: 'VOLUNTEER SAVINGS', value: fmt(totalVolSav), sub: 'total saved with volunteer labor', color: '#c47f18' },
+    { label: 'SAVINGS FROM VOLUNTEERS & CONTRIBUTIONS', value: fmt(totalVolSav), sub: 'saved through volunteers and donated materials', color: '#c47f18' },
   ];
 
   document.getElementById('overview-cards').innerHTML = cards.map(function(c) {
