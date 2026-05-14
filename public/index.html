@@ -620,7 +620,6 @@
   <div style="display:flex;">
     <button class="nav-tab active" id="tab-overview" onclick="switchPage('overview')">Project Overview</button>
     <button class="nav-tab admin-tab" id="tab-budget" onclick="switchPage('budget')">Budget</button>
-    <button class="nav-tab admin-tab" id="tab-volunteers" onclick="switchPage('volunteers')">Volunteers</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="save-indicator" style="font-size:.72rem;color:var(--ice);opacity:0;transition:opacity .4s;font-family:Montserrat,sans-serif;letter-spacing:.05em;"></span>
@@ -696,24 +695,7 @@
 
 </div><!-- /page-budget -->
 
-<!-- Volunteer Page -->
-<div class="page" id="page-volunteers">
 
-  <!-- Vol KPI -->
-  <div class="vol-kpi-grid" id="vol-kpi-grid"></div>
-
-
-
-  <!-- Volunteer Contributions -->
-  <div class="section-label">Volunteer Contributions</div>
-  <div class="log-section">
-    <div class="log-toolbar">
-      <h2>All Contributions</h2>
-    </div>
-    <div id="vol-table-wrap"></div>
-  </div>
-
-</div><!-- /page-volunteers -->
 
 <!-- Delete Modal -->
 <div class="modal-backdrop" id="del-modal">
@@ -727,17 +709,7 @@
   </div>
 </div>
 
-<!-- Volunteer Delete Modal -->
-<div class="modal-backdrop" id="vol-del-modal">
-  <div class="modal">
-    <h3>Delete Entry?</h3>
-    <p style="font-size:.88rem;color:var(--text-muted);">This action cannot be undone.</p>
-    <div class="modal-actions">
-      <button class="btn-outline" onclick="closeVolDelModal()">Cancel</button>
-      <button class="btn-danger" onclick="confirmVolDelete()">Delete</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- Year Budget Modal -->
 <div class="modal-backdrop" id="yearbud-modal">
@@ -981,7 +953,7 @@ function renderKPI() {
   var spent = totalSpent();
   var total = qboTotalBudget();
   var rem = total - spent;
-  var volSav = TOTAL_VOLUNTEER_SAVINGS;
+  var volSav = totalVolSavings();
   var elapsed = daysSinceStart(), totalDays = projectDaysTotal();
   var cards = [
     {icon:'⛪', label:'Total Budget',   value:fmt(total),   sub:'2026–2028', hi:true},
@@ -1234,25 +1206,25 @@ let volunteers = [
   { notes: 'Framing, Drywall, & Ramp', rate: 20000 },
 ];
 var TOTAL_UNIQUE_VOLUNTEERS = 68;
-var TOTAL_VOLUNTEER_SAVINGS = 41000;
+var TOTAL_VOLUNTEER_SAVINGS = 41000; // fallback — overridden by completion-based calc
 
 // ── Phase schedule & project details ────────────────────────
 var PHASE_SCHEDULE = [
   { name: 'Phase 1: Planning, 473 Demo, Exterior Rebuild & Leased Space', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12, budget: 192500,
     projects: [
-      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 10000, details: [
+      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 10000, market: 20000, details: [
           'Demo & Misc. — $2,000',
           'Framing for New Walls + Layout — $2,500',
           'Drywall — Hang, Tape, Sand — $5,500',
         ]
       },
-      { name: 'Leased Space Mechanicals', deadline: '6/30/2026', budget: 17000, details: [
+      { name: 'Leased Space Mechanicals', deadline: '6/30/2026', budget: 17000, market: 30000, details: [
           'Plumbing — Bathroom + Kitchenette — $10,000',
           'Electrical + Low Voltage — $3,000',
           'HVAC — Moving for Layout — $4,000',
         ]
       },
-      { name: 'Leased Space Finishing', deadline: '8/15/2026', budget: 26000, details: [
+      { name: 'Leased Space Finishing', deadline: '8/15/2026', budget: 26000, market: 50000, details: [
           'Flooring (carpet tile, wood, polished concrete) — $5,000',
           'Painting — $2,000',
           'Room Furnishings + AV — $5,000',
@@ -1260,38 +1232,38 @@ var PHASE_SCHEDULE = [
           'Finish Construction - Ramp, Alcove, Office Wall, Island, Trim — $10,000',
         ]
       },
-      { name: '473 Site Work + Utilities', deadline: '8/31/2026', budget: 29000, details: [
+      { name: '473 Site Work + Utilities', deadline: '8/31/2026', budget: 29000, market: 35000, details: [
           'Move Utilities + New Furnace — $14,000',
           'Footings (perimeter, 48" deep) — $8,000',
           'Drainage Install + Storm Tie-in — $3,500',
           'Excavating, Backfill, Compacted Gravel — $3,500',
         ]
       },
-      { name: '473 Rear Demo + Exterior Rebuild', deadline: '10/15/2026', budget: 39500, details: [
+      { name: '473 Rear Demo + Exterior Rebuild', deadline: '10/15/2026', budget: 39500, market: 50000, details: [
           'House + Site Demo, Haulaway — $10,000',
           'Rebuild Back Roof, Wall + Stairwell Landing, Re-Roof — $25,000',
           'Rear Facade — $4,500',
         ]
       },
-      { name: 'Covered Walkway + Patio Finishing', deadline: '12/15/2026', budget: 18500, details: [
+      { name: 'Covered Walkway + Patio Finishing', deadline: '12/15/2026', budget: 18500, market: 25000, details: [
           'Covered Walkway + Awnings + Privacy Fence — $10,000',
           'Concrete Finishing + Pavers (Patio) — $3,500',
           'Rear Exterior Lighting — $1,500',
           'Outdoor Furnishings (tables, fire pit) — $3,500',
         ]
       },
-      { name: 'Admin & Management', deadline: '', budget: 39500, details: [
+      { name: 'Admin & Management', deadline: '', budget: 39500, market: 60000, details: [
           'Project Planning, Design & Management — $32,000',
           'Approvals and Permits — $5,000',
           'Insurance, Safety & Misc — $2,500',
         ]
       },
-      { name: 'Contingency', deadline: '', budget: 13000, details: [] },
+      { name: 'Contingency', deadline: '', budget: 13000, market: 0, details: [] },
     ]
   },
   { name: 'Phase 2: Connecting Addition + 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12, budget: 197500,
     projects: [
-      { name: 'Addition Shell', deadline: '3/31/2027', budget: 55000, details: [
+      { name: 'Addition Shell', deadline: '3/31/2027', budget: 55000, market: 65000, details: [
           'Wall + Ceiling Structure (steel studs + truss) — $15,000',
           'Roof Decking, Insulation, Membrane (TPO) — $18,000',
           'Rear Facade (Addition Only) — brick + paneling — $15,000',
@@ -1299,7 +1271,7 @@ var PHASE_SCHEDULE = [
           'Concrete Slab + Combine Closet — $3,000',
         ]
       },
-      { name: 'Addition Mechanicals', deadline: '6/30/2027', budget: 27000, details: [
+      { name: 'Addition Mechanicals', deadline: '6/30/2027', budget: 27000, market: 30000, details: [
           'Furnace + Condenser Install — $11,000',
           'Ducting (addition + nursery + wiggle room) — $4,000',
           'Sprinkler Extension + Gas Piping — $5,000',
@@ -1307,7 +1279,7 @@ var PHASE_SCHEDULE = [
           'Smoke / CO / Fire Alarm + Data / Security / AV — $3,000',
         ]
       },
-      { name: 'Addition Interior Finishing', deadline: '6/30/2027', budget: 20000, details: [
+      { name: 'Addition Interior Finishing', deadline: '6/30/2027', budget: 20000, market: 30000, details: [
           'Drywall — $6,000',
           'Doors and Finishing — $5,000',
           'Floor Finishing (sealed concrete) — $4,000',
@@ -1315,7 +1287,7 @@ var PHASE_SCHEDULE = [
           'Furnishings (checkin, basic AV) — $3,000',
         ]
       },
-      { name: 'Openings + 473 Existing Space Remodeling', deadline: '8/31/2027', budget: 27000, details: [
+      { name: 'Openings + 473 Existing Space Remodeling', deadline: '8/31/2027', budget: 27000, market: 35000, details: [
           'Rear Facade Brick Veneer + Paneling (existing 473) — $8,000',
           'Misc. Finishing (move wall, paint, etc.) — $7,000',
           'New Door Install (security) — $5,000',
@@ -1323,7 +1295,7 @@ var PHASE_SCHEDULE = [
           'Move Electrical and Gas Lines — $3,000',
         ]
       },
-      { name: 'Facade Finishing', deadline: '10/31/2027', budget: 27500, details: [
+      { name: 'Facade Finishing', deadline: '10/31/2027', budget: 27500, market: 30000, details: [
           'Addition Double Door / Storefront System — $11,000',
           'Lower Facade Brick Veneer — $6,000',
           'Paneling or Stucco — $3,500',
@@ -1331,18 +1303,18 @@ var PHASE_SCHEDULE = [
           'New Lighting + Demo Existing Awning — $2,000',
         ]
       },
-      { name: 'Admin & Management', deadline: '', budget: 28000, details: [
+      { name: 'Admin & Management', deadline: '', budget: 28000, market: 40000, details: [
           'Plan Approval + Permits — $2,000',
           'Project Planning, Design & Management — $24,000',
           'Insurance + Misc Admin — $2,000',
         ]
       },
-      { name: 'Contingency', deadline: '', budget: 13000, details: [] },
+      { name: 'Contingency', deadline: '', budget: 13000, market: 0, details: [] },
     ]
   },
   { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12, budget: 160000,
     projects: [
-      { name: 'Move Bathrooms', deadline: '3/31/2028', budget: 27000, details: [
+      { name: 'Move Bathrooms', deadline: '3/31/2028', budget: 27000, market: 40000, details: [
           'Move Plumbing + Finishes — $7,000',
           'Flooring + Replace Ceiling Tiles — $5,500',
           'Demo + Framing, Drywall, Paint + HVAC Re-work — $7,500',
@@ -1350,7 +1322,7 @@ var PHASE_SCHEDULE = [
           'Electrical — $3,000',
         ]
       },
-      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 24000, details: [
+      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 24000, market: 32500, details: [
           'Hallway Security Doors + Glass Surround — $9,000',
           'Convert Ceiling to Drywall (matched w/ hallway) — $4,000',
           'Flooring (tile or other) — $4,000',
@@ -1358,7 +1330,7 @@ var PHASE_SCHEDULE = [
           'Finishing (trim, paint, misc.) — $3,000',
         ]
       },
-      { name: 'Cry Room + Prayer Room', deadline: '6/30/2028', budget: 21000, details: [
+      { name: 'Cry Room + Prayer Room', deadline: '6/30/2028', budget: 21000, market: 30000, details: [
           'New Back Wall / Glass Patio Accordion Door — $8,500',
           'Nap Room + Wall Soundproofing — $4,500',
           'Drywall + Paint + Move Doors — $4,000',
@@ -1366,7 +1338,7 @@ var PHASE_SCHEDULE = [
           'Sound into Cry/Nursing Areas + AV — $2,000',
         ]
       },
-      { name: 'Open Up/Expand Worship Space', deadline: '9/30/2028', budget: 35000, details: [
+      { name: 'Open Up/Expand Worship Space', deadline: '9/30/2028', budget: 35000, market: 50000, details: [
           'Raise/Re-work Ceiling + Drywall (back wall) — $20,000',
           'Rework Flooring along new back wall — $3,500',
           'Mechanical Reworking + Ducting — $4,000',
@@ -1374,7 +1346,7 @@ var PHASE_SCHEDULE = [
           'Demo + Misc Finishing — $2,500',
         ]
       },
-      { name: 'Conference Room', deadline: '12/15/2028', budget: 14000, details: [
+      { name: 'Conference Room', deadline: '12/15/2028', budget: 14000, market: 25000, details: [
           'Doors — $3,500',
           'Flooring, Wall, Ceiling Finishing — $3,000',
           'Furnishing Buildout — $3,000',
@@ -1382,13 +1354,13 @@ var PHASE_SCHEDULE = [
           'Add/Rework HVAC and Electrical — $2,000',
         ]
       },
-      { name: 'Admin & Management', deadline: '', budget: 28000, details: [
+      { name: 'Admin & Management', deadline: '', budget: 28000, market: 40000, details: [
           'Plan Approval + Permits — $2,000',
           'Project Planning, Design & Management — $24,000',
           'Insurance + Misc Admin — $2,000',
         ]
       },
-      { name: 'Contingency', deadline: '', budget: 11000, details: [] },
+      { name: 'Contingency', deadline: '', budget: 11000, market: 0, details: [] },
     ]
   },
 ];
@@ -1425,12 +1397,41 @@ function switchPage(page) {
 }
 
 function totalVolHours() { return 0; } // removed - no longer tracked
-function totalVolSavings() { return TOTAL_VOLUNTEER_SAVINGS; }
+function totalVolSavings() {
+  // Calculate savings from completed projects:
+  // For each completed project, savings = market cost - actual QBO spend
+  var savings = 0;
+  PHASE_SCHEDULE.forEach(function(phase, pi) {
+    (phase.projects || []).forEach(function(proj, prIdx) {
+      if (!proj.market || proj.market === 0) return; // skip contingency
+      // Check if this project is "complete" — all its detail items are checked
+      // For projects with no details, check a top-level key
+      var details = proj.details || [];
+      var isComplete = false;
+      if (details.length > 0) {
+        var allChecked = details.every(function(d, dIdx) {
+          return completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx];
+        });
+        isComplete = allChecked;
+      }
+      if (isComplete) {
+        // Get actual spend from QBO data
+        var actualSpent = 0;
+        if (qboData && qboData.length > pi) {
+          var qboProj = (qboData[pi].projects || []).find(function(p){ return p.name === proj.name; });
+          if (qboProj) actualSpent = qboProj.spent || 0;
+        }
+        savings += Math.max(0, proj.market - actualSpent);
+      }
+    });
+  });
+  return savings;
+}
 
 function renderVolKPI() {
   var cards = [
     { label:'Volunteers', value: TOTAL_UNIQUE_VOLUNTEERS.toLocaleString(), sub:'contributed to this project', hi:true },
-    { label:'Total Value Saved', value: fmt(TOTAL_VOLUNTEER_SAVINGS), sub:'saved with volunteer labor', hi:true },
+    { label:'Total Value Saved', value: fmt(totalVolSavings()), sub:'saved with volunteer labor', hi:true },
   ];
   var el = document.getElementById('vol-kpi-grid');
   if (!el) return;
@@ -2179,7 +2180,7 @@ function renderOverview() {
 
   var ts = totalSpent();
   var phasePct = getPhaseProgress();
-  var totalVolSav = TOTAL_VOLUNTEER_SAVINGS;
+  var totalVolSav = totalVolSavings();
   var totalVolPeople = TOTAL_UNIQUE_VOLUNTEERS;
 
   // Stat cards
@@ -2277,7 +2278,8 @@ function renderOverview() {
           tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?phColor:'#ccc')+';background:'+(checked?phColor:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
           if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
           tHtml += '</div>';
-          tHtml += '<span style="'+strikeStyle+'color:var(--text-muted);">'+detail+'</span>';
+          var detailName = detail.lastIndexOf(' — ') > -1 ? detail.substring(0, detail.lastIndexOf(' — ')) : detail;
+          tHtml += '<span style="'+strikeStyle+'color:var(--text-muted);">'+detailName+'</span>';
           tHtml += '</div>';
         });
       });
@@ -2363,72 +2365,101 @@ function renderQBOBreakdown() {
   var el = document.getElementById('qbo-phase-breakdown');
   if (!el) return;
 
-  if (!qboData || !qboData.length) {
-    el.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:.9rem;text-align:center;">No QBO data loaded yet. Share a QBO report to update.</div>';
-    return;
-  }
-
-  var PHASE_COLORS = ['#2b4560','#c05f3c','#2a7a5a'];
   var html = '';
 
-  qboData.forEach(function(phase, pi) {
-    var phColor = PHASE_COLORS[pi] || '#2b4560';
+  PHASE_SCHEDULE.forEach(function(phase, pi) {
+    var phColor = phase.color;
     var phBudget = phase.budget || 0;
-    var phSpent = phase.spent || 0;
-    var phPct = phBudget > 0 ? Math.min(Math.round(phSpent/phBudget*100), 100) : 0;
-    var phStatus = phSpent === 0 ? 'NOT STARTED' : phBudget > 0 && phSpent > phBudget ? 'AT RISK' : phPct > 80 ? 'WATCH' : 'ON TRACK';
+
+    // Get spent from qboData if available
+    var phSpent = 0;
+    if (qboData && qboData.length > pi) phSpent = qboData[pi].spent || 0;
+    var phPct = phBudget > 0 ? Math.min(Math.round(phSpent / phBudget * 100), 100) : 0;
+    var phStatus = phSpent === 0 ? 'NOT STARTED' : phSpent > phBudget ? 'AT RISK' : phPct > 80 ? 'WATCH' : 'ON TRACK';
     var phStatusColor = phStatus === 'NOT STARTED' ? '#6c757d' : phStatus === 'AT RISK' ? '#dc3545' : phStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
 
-    html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-sm);">';
+    var phId = 'qbo-phase-' + pi;
+
+    // Phase row
+    html += '<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow-sm);">';
+
     // Phase header
-    var phId = 'phase-collapse-'+pi;
-    html += '<div style="background:'+phColor+';padding:12px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="togglePhaseCollapse(\''+phId+'\')">'
-;    html += '<div style="display:flex;align-items:center;gap:10px;">';
-    html += '<span id="'+phId+'-arrow" style="color:#fff;font-size:.8rem;transition:transform .2s;">&#9660;</span>';
-    html += '<span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:.95rem;color:#fff;">'+phase.name+'</span>';
+    html += '<div data-phid="'+phId+'" onclick="toggleQBOPhase(this.dataset.phid)" style="background:'+phColor+';padding:12px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    html += '<span id="'+phId+'-arrow" style="color:#fff;font-size:.6rem;transition:transform .2s;transform:rotate(-90deg);">&#9660;</span>';
+    html += '<span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:.92rem;color:#fff;">'+phase.name+'</span>';
     html += '</div>';
-    html += '<div style="display:flex;align-items:center;gap:16px;">';
-    html += '<span style="font-size:.82rem;color:rgba(255,255,255,.8);">'+fmt(phSpent)+' / '+fmt(phBudget)+'</span>';
-    html += '<span style="background:'+phStatusColor+';color:#fff;font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:4px;font-family:Montserrat,sans-serif;letter-spacing:.05em;white-space:nowrap;">'+phStatus+'</span>';
+    html += '<div style="display:flex;align-items:center;gap:14px;">';
+    html += '<span style="font-size:.82rem;color:rgba(255,255,255,.85);">'+fmt(phSpent)+' spent &nbsp;/&nbsp; '+fmt(phBudget)+' budget</span>';
+    html += '<span style="background:'+phStatusColor+';color:#fff;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:4px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+phStatus+'</span>';
     html += '</div></div>';
+
     // Phase progress bar
-    html += '<div style="height:6px;background:#e8edf2;"><div style="height:6px;width:'+phPct+'%;background:'+phColor+';transition:width .5s;"></div></div>';
+    html += '<div style="height:5px;background:#e8edf2;"><div style="height:5px;width:'+phPct+'%;background:'+phColor+';transition:width .5s;"></div></div>';
 
-    // Projects (collapsible)
-    html += '<div id="'+phId+'-body" style="padding:0 16px 8px;">';
-    (phase.projects || []).forEach(function(proj) {
+    // Phase body (collapsible)
+    html += '<div id="'+phId+'-body" style="display:none;">';
+
+    // Projects
+    (phase.projects || []).forEach(function(proj, prIdx) {
       var prBudget = proj.budget || 0;
-      var prSpent = proj.spent || 0;
-      if (prSpent === 0 && prBudget === 0) return; // skip empty
-      var prPct = prBudget > 0 ? Math.min(Math.round(prSpent/prBudget*100), 100) : 0;
-      var prStatus = prSpent === 0 ? 'NOT STARTED' : prBudget > 0 && prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prSpent = 0;
+      if (qboData && qboData.length > pi) {
+        var qboProj = (qboData[pi].projects || []).find(function(p){ return p.name === proj.name; });
+        if (qboProj) prSpent = qboProj.spent || 0;
+      }
+      var prPct = prBudget > 0 ? Math.min(Math.round(prSpent / prBudget * 100), 100) : 0;
+      var isContingency = proj.name === 'Contingency';
+      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
       var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'AT RISK' ? '#dc3545' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
-      var barColor = prStatus === 'AT RISK' ? '#dc3545' : phColor;
+      var hasDetails = proj.details && proj.details.length > 0;
+      var prId = 'qbo-proj-'+pi+'-'+prIdx;
 
-      html += '<div style="border-bottom:1px solid var(--border);padding:10px 4px;">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
-      html += '<span style="font-weight:600;font-size:.88rem;color:var(--navy);">'+proj.name+'</span>';
-      html += '<div style="display:flex;align-items:center;gap:10px;">';
-      html += '<span style="font-size:.8rem;color:var(--text-muted);">'+fmt(prSpent)+' / '+fmt(prBudget)+'</span>';
-      html += '<span style="background:'+prStatusColor+';color:#fff;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:3px;font-family:Montserrat,sans-serif;letter-spacing:.05em;white-space:nowrap;">'+prStatus+'</span>';
+      html += '<div style="border-bottom:1px solid var(--border);">';
+
+      // Project row
+      html += '<div data-prid="'+prId+'" style="padding:10px 20px 10px 32px;display:flex;justify-content:space-between;align-items:center;'+(hasDetails?'cursor:pointer;':'')+(prSpent===0?'background:var(--off-white);':'')+'" '+(hasDetails?'onclick="toggleQBOProject(this.dataset.prid)"':'')+' >';
+      html += '<div style="display:flex;align-items:center;gap:7px;">';
+      if (hasDetails) html += '<span id="'+prId+'-arrow" style="font-size:.55rem;color:'+phColor+';transition:transform .2s;transform:rotate(-90deg);">&#9660;</span>';
+      else html += '<span style="width:12px;display:inline-block;"></span>';
+      html += '<div>';
+      html += '<div style="font-weight:600;font-size:.88rem;color:var(--navy);">'+proj.name+'</div>';
+      if (proj.deadline) html += '<div style="font-size:.72rem;color:var(--text-muted);">Due: '+proj.deadline+'</div>';
       html += '</div></div>';
-      // Progress bar
-      html += '<div style="height:5px;background:#e8edf2;border-radius:3px;"><div style="height:5px;width:'+prPct+'%;background:'+barColor+';border-radius:3px;transition:width .5s;"></div></div>';
+      html += '<div style="display:flex;align-items:center;gap:12px;">';
+      html += '<div style="text-align:right;">';
+      html += '<div style="font-size:.82rem;color:var(--text-muted);">Spent: '+fmt(prSpent)+' / '+fmt(prBudget)+'</div>';
+      if (proj.market && proj.market > 0) {
+        html += '<div style="font-size:.75rem;color:var(--text-muted);margin-top:2px;">Market: <span style="color:#c05f3c;font-weight:600;">'+fmt(proj.market)+'</span></div>';
+      }
+      if (prBudget > 0) {
+        html += '<div style="height:4px;width:100px;background:#e8edf2;border-radius:2px;margin-top:3px;"><div style="height:4px;width:'+prPct+'%;background:'+phColor+';border-radius:2px;"></div></div>';
+      }
+      html += '</div>';
+      if (prStatus) html += '<span style="background:'+prStatusColor+';color:#fff;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:3px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+prStatus+'</span>';
+      html += '</div></div>';
 
-      // Subcategories
-      if (proj.subcats && proj.subcats.some(function(s){ return s.spent > 0; })) {
-        html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;">';
-        proj.subcats.forEach(function(sub) {
-          if (sub.spent === 0) return;
-          html += '<span style="background:var(--off-white);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.75rem;color:var(--navy);">';
-          html += sub.name+': '+fmt(sub.spent);
-          html += '</span>';
+      // Line items (collapsible)
+      if (hasDetails) {
+        html += '<div id="'+prId+'-body" style="display:none;background:#fafcff;border-top:1px solid var(--border);">';
+        proj.details.forEach(function(detail) {
+          // Parse name and amount — split on LAST ' — ' to handle dashes in names
+          var lastDash = detail.lastIndexOf(' — ');
+          var dName = lastDash > -1 ? detail.substring(0, lastDash) : detail;
+          var dAmt  = lastDash > -1 ? detail.substring(lastDash + 3) : '';
+          html += '<div style="padding:7px 20px 7px 56px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f4f8;">';
+          html += '<span style="font-size:.78rem;color:var(--text-muted);">'+dName+'</span>';
+          html += '<span style="font-size:.78rem;font-weight:600;color:var(--navy);">'+dAmt+'</span>';
+          html += '</div>';
         });
         html += '</div>';
       }
-      html += '</div>';
+
+      html += '</div>'; // close project
     });
-    html += '</div></div>';
+
+    html += '</div>'; // close phase body
+    html += '</div>'; // close phase card
   });
 
   el.innerHTML = html;
@@ -2444,6 +2475,24 @@ function renderQBOBreakdown() {
     if (bannerDate) bannerDate.textContent = formatted;
     if (banner) banner.style.display = 'flex';
   }
+}
+
+function toggleQBOPhase(phId) {
+  var body = document.getElementById(phId + '-body');
+  var arrow = document.getElementById(phId + '-arrow');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+
+function toggleQBOProject(prId) {
+  var body = document.getElementById(prId + '-body');
+  var arrow = document.getElementById(prId + '-arrow');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
 }
 
 function renderPhaseSummaryTable() {
