@@ -2246,8 +2246,8 @@ function renderOverview() {
     var phSpent = 0;
     if (qboData && qboData.length > pi) phSpent = qboData[pi].spent || 0;
     var phPct = phBudget > 0 ? Math.min(Math.round(phSpent / phBudget * 100), 100) : 0;
-    var budgetStatus = phSpent === 0 ? 'NOT STARTED' : phSpent > phBudget ? 'AT RISK' : phPct > 80 ? 'WATCH' : 'ON TRACK';
-    var budgetStatusColor = budgetStatus === 'NOT STARTED' ? '#6c757d' : budgetStatus === 'AT RISK' ? '#dc3545' : budgetStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+    var budgetStatus = phSpent === 0 ? 'NOT STARTED' : phSpent >= phBudget ? 'BUDGET MET' : phPct > 80 ? 'WATCH' : 'ON TRACK';
+    var budgetStatusColor = budgetStatus === 'NOT STARTED' ? '#6c757d' : budgetStatus === 'BUDGET MET' ? '#2b4560' : budgetStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
 
     var phId = 'tl-phase-' + pi;
 
@@ -2303,8 +2303,11 @@ function renderOverview() {
         if (qboProj) prSpent = qboProj.spent || 0;
       }
       var prPct = prBudget > 0 ? Math.min(Math.round(prSpent / prBudget * 100), 100) : 0;
-      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
-      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'AT RISK' ? '#dc3545' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+      // Overflow spending spills into contingency
+      var overflow = prSpent > prBudget ? prSpent - prBudget : 0;
+      var effectiveSpent = Math.min(prSpent, prBudget);
+      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent >= prBudget ? 'BUDGET MET' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'BUDGET MET' ? '#2b4560' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
 
       var hasDetails = projDetails.length > 0;
       var prId = 'tl-proj-'+pi+'-'+prIdx;
@@ -2328,12 +2331,33 @@ function renderOverview() {
         if (prMarket > 0) tHtml += '<div style="font-size:.72rem;color:#c05f3c;">Market: '+fmt(prMarket)+'</div>';
         if (prBudget > 0) {
           tHtml += '<div style="width:80px;height:4px;background:#e8edf2;border-radius:2px;margin-top:3px;">';
-          tHtml += '<div style="height:4px;width:'+prPct+'%;background:'+phColor+';border-radius:2px;"></div></div>';
+          tHtml += '<div style="height:4px;width:'+Math.min(prPct,100)+'%;background:'+(prSpent>=prBudget?'#2b4560':phColor)+';border-radius:2px;"></div></div>';
+          if (overflow > 0) tHtml += '<div style="font-size:.7rem;color:#c47f18;margin-top:2px;">+'+fmt(overflow)+' → contingency</div>';
         }
         tHtml += '</div>';
         if (prStatus) tHtml += '<span style="background:'+prStatusColor+';color:#fff;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:3px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+prStatus+'</span>';
       } else {
-        tHtml += '<span style="font-size:.82rem;color:var(--text-muted);">'+fmt(prBudget)+'</span>';
+        // Calculate total overflow from all projects in this phase
+        var totalOverflow = 0;
+        (ph.projects || []).forEach(function(p2, p2Idx) {
+          if (p2.name === 'Contingency') return;
+          var p2Spent = 0;
+          if (qboData && qboData.length > pi) {
+            var q2 = (qboData[pi].projects || []).find(function(q){ return q.name === p2.name; });
+            if (q2) p2Spent = q2.spent || 0;
+          }
+          if (p2Spent > (p2.budget||0)) totalOverflow += p2Spent - (p2.budget||0);
+        });
+        if (totalOverflow > 0) {
+          tHtml += '<div style="text-align:right;">';
+          tHtml += '<div style="font-size:.8rem;color:var(--text-muted);">'+fmt(totalOverflow)+' absorbed / '+fmt(prBudget)+'</div>';
+          tHtml += '<div style="height:4px;width:80px;background:#e8edf2;border-radius:2px;margin-top:3px;">';
+          tHtml += '<div style="height:4px;width:'+Math.min(totalOverflow/prBudget*100,100).toFixed(0)+'%;background:#c47f18;border-radius:2px;"></div></div>';
+          tHtml += '</div>';
+          tHtml += '<span style="background:#c47f18;color:#fff;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:3px;font-family:Montserrat,sans-serif;white-space:nowrap;">IN USE</span>';
+        } else {
+          tHtml += '<span style="font-size:.82rem;color:var(--text-muted);">'+fmt(prBudget)+' reserved</span>';
+        }
       }
       tHtml += '</div></div>';
 
@@ -2521,8 +2545,11 @@ function renderQBOBreakdown() {
       }
       var prPct = prBudget > 0 ? Math.min(Math.round(prSpent / prBudget * 100), 100) : 0;
       var isContingency = proj.name === 'Contingency';
-      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
-      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'AT RISK' ? '#dc3545' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+      // Overflow spending spills into contingency
+      var overflow = prSpent > prBudget ? prSpent - prBudget : 0;
+      var effectiveSpent = Math.min(prSpent, prBudget);
+      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent >= prBudget ? 'BUDGET MET' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'BUDGET MET' ? '#2b4560' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
       var hasDetails = proj.details && proj.details.length > 0;
       var prId = 'qbo-proj-'+pi+'-'+prIdx;
 
