@@ -2802,8 +2802,8 @@ function initAuthMode() {
     // Public view — hide admin tabs and sign out
     // Do NOT render here — wait for public data fetch to complete first
     document.querySelectorAll('.admin-tab').forEach(function(t){ t.style.display = 'none'; });
-    document.getElementById('signout-btn').style.display = 'none';
-    document.getElementById('pdf-btn').style.display = 'none';
+    var signout = document.getElementById('signout-btn'); if (signout) signout.style.display = 'none';
+    var pdfBtn  = document.getElementById('pdf-btn');    if (pdfBtn)  pdfBtn.style.display  = 'none';
   } else {
     // Authenticated admin
     IS_ADMIN = true;
