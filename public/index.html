@@ -2799,11 +2799,11 @@ var IS_PUBLIC = window.location.pathname === '/public';
 
 function initAuthMode() {
   if (IS_PUBLIC) {
-    // Public view — hide admin tabs and sign out, show only overview
+    // Public view — hide admin tabs and sign out
+    // Do NOT render here — wait for public data fetch to complete first
     document.querySelectorAll('.admin-tab').forEach(function(t){ t.style.display = 'none'; });
     document.getElementById('signout-btn').style.display = 'none';
     document.getElementById('pdf-btn').style.display = 'none';
-    switchPage('overview');
   } else {
     // Authenticated admin
     IS_ADMIN = true;
