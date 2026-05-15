@@ -2371,11 +2371,18 @@ function renderOverview() {
           var dName = lastDash > -1 ? detail.substring(0, lastDash) : detail;
           var dAmt  = lastDash > -1 ? detail.substring(lastDash + 3) : '';
           var strikeStyle = checked ? 'text-decoration:line-through;color:#aaa;' : '';
-          tHtml += '<div data-key="'+key+'" onclick="handleCheckClick(this,event)" style="padding:7px 20px 7px 44px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f4f8;cursor:pointer;">';
+          tHtml += '<div data-key="'+key+'" onclick="handleCheckClick(this,event)" style="padding:7px 20px 7px 44px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f4f8;cursor:"+(IS_PUBLIC?'default':'pointer')+";">';
           tHtml += '<div style="display:flex;align-items:center;gap:8px;">';
-          tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?phColor:'#ccc')+';background:'+(checked?phColor:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
-          if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
-          tHtml += '</div>';
+          if (IS_PUBLIC) {
+            // Read-only indicator on public page
+            tHtml += '<div style="width:15px;height:15px;border-radius:50%;background:'+(checked?phColor:'#e0e0e0')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
+            if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
+            tHtml += '</div>';
+          } else {
+            tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?phColor:'#ccc')+';background:'+(checked?phColor:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
+            if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
+            tHtml += '</div>';
+          }
           tHtml += '<span style="'+strikeStyle+'font-size:.78rem;color:var(--text-muted);">'+dName+'</span>';
           tHtml += '</div>';
           // dAmt intentionally not shown — budget detail at project level only
@@ -2417,7 +2424,7 @@ function saveCompletedProjects() {
   }).catch(function(e){ console.error('Save completed projects failed:', e); });
 }
 
-function handleCheckClick(el, event) { toggleProjectComplete(el.getAttribute('data-key'), event); }
+function handleCheckClick(el, event) { if (IS_PUBLIC) return; toggleProjectComplete(el.getAttribute('data-key'), event); }
 function toggleProjectComplete(key, event) {
   if (event) event.stopPropagation();
   completedProjects[key] = !completedProjects[key];
