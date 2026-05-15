@@ -2371,7 +2371,7 @@ function renderOverview() {
           var dName = lastDash > -1 ? detail.substring(0, lastDash) : detail;
           var dAmt  = lastDash > -1 ? detail.substring(lastDash + 3) : '';
           var strikeStyle = checked ? 'text-decoration:line-through;color:#aaa;' : '';
-          tHtml += '<div data-key="'+key+'" onclick="handleCheckClick(this,event)" style="padding:7px 20px 7px 44px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f4f8;cursor:"+(IS_PUBLIC?'default':'pointer')+";">';
+          tHtml += '<div data-key="'+key+'" onclick="handleCheckClick(this,event)" style="padding:7px 20px 7px 44px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f4f8;">' + '';
           tHtml += '<div style="display:flex;align-items:center;gap:8px;">';
           if (IS_PUBLIC) {
             // Read-only indicator on public page
