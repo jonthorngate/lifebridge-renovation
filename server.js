@@ -33,9 +33,22 @@ function requireAuth(req, res, next) {
   res.redirect('/login');
 }
 
+function requireAuthAPI(req, res, next) {
+  if (req.session && req.session.authenticated) return next();
+  res.status(401).json({ ok: false, error: 'Unauthorized' });
+}
+
 const DEFPASS = 'lifebridge';
 
 async function checkPassword(input) {
+  try {
+    const r = await pool.query("SELECT value FROM tracker_data WHERE key='lb_admin_password'");
+    if (r.rows.length > 0) {
+      const stored = JSON.parse(r.rows[0].value);
+      if (stored.startsWith('$2')) return bcrypt.compare(input, stored);
+      return input === stored;
+    }
+  } catch(e) {}
   const s = process.env.APP_PASSWORD || DEFPASS;
   if (s.startsWith('$2')) return bcrypt.compare(input, s);
   return input === s;
@@ -51,6 +64,7 @@ app.use(session({
   cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, secure: false, sameSite: 'lax' }
 }));
 
+// ── Public routes ──────────────────────────────────────────
 app.get('/login', (req, res) => {
   if (req.session.authenticated) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
@@ -58,9 +72,7 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { password } = req.body;
-  console.log('Login attempt:', password);
   const ok = await checkPassword(password);
-  console.log('Password check result:', ok);
   if (ok) {
     req.session.authenticated = true;
     req.session.save((err) => {
@@ -73,29 +85,47 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/login');
-  });
+  req.session.destroy(() => res.redirect('/login'));
 });
 
-app.get('/', requireAuth, (req, res) => {
+// Public view — serves index.html without requiring auth
+app.get('/public', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/api/data', requireAuth, async (req, res) => {
+// Public data endpoint — returns all tracker data for public view
+app.get('/api/public-data', async (req, res) => {
   try {
     const r = await pool.query('SELECT key,value FROM tracker_data');
     const d = {};
     r.rows.forEach(row => {
-      try { d[row.key] = JSON.parse(row.value); } catch (e) { d[row.key] = row.value; }
+      try { d[row.key] = JSON.parse(row.value); } catch(e) { d[row.key] = row.value; }
     });
     res.json({ ok: true, data: d });
-  } catch (e) {
+  } catch(e) {
     res.status(500).json({ ok: false, error: e.message });
   }
 });
 
-app.post('/api/data/bulk', requireAuth, async (req, res) => {
+// ── Admin-only routes ──────────────────────────────────────
+app.get('/', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/api/data', requireAuthAPI, async (req, res) => {
+  try {
+    const r = await pool.query('SELECT key,value FROM tracker_data');
+    const d = {};
+    r.rows.forEach(row => {
+      try { d[row.key] = JSON.parse(row.value); } catch(e) { d[row.key] = row.value; }
+    });
+    res.json({ ok: true, data: d });
+  } catch(e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.post('/api/data/bulk', requireAuthAPI, async (req, res) => {
   try {
     const { data } = req.body;
     if (!data) return res.status(400).json({ ok: false });
@@ -110,14 +140,24 @@ app.post('/api/data/bulk', requireAuth, async (req, res) => {
         );
       }
       await client.query('COMMIT');
-    } catch (e) {
+    } catch(e) {
       await client.query('ROLLBACK');
       throw e;
     } finally {
       client.release();
     }
     res.json({ ok: true });
-  } catch (e) {
+  } catch(e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.get('/api/settings', requireAuthAPI, async (req, res) => {
+  try {
+    const r = await pool.query("SELECT value FROM tracker_data WHERE key='lb_webhook_url'");
+    const webhookUrl = r.rows.length > 0 ? JSON.parse(r.rows[0].value) : '';
+    res.json({ ok: true, webhookUrl });
+  } catch(e) {
     res.status(500).json({ ok: false, error: e.message });
   }
 });
