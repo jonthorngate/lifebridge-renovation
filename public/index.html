@@ -619,7 +619,6 @@
 <div class="nav-tabs" style="display:flex;justify-content:space-between;align-items:center;padding-right:20px;">
   <div style="display:flex;">
     <button class="nav-tab active" id="tab-overview" onclick="switchPage('overview')">Project Overview</button>
-    <button class="nav-tab admin-tab" id="tab-budget" onclick="switchPage('budget')">Budget</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="save-indicator" style="font-size:.72rem;color:var(--ice);opacity:0;transition:opacity .4s;font-family:Montserrat,sans-serif;letter-spacing:.05em;"></span>
@@ -634,30 +633,13 @@
 <div class="container">
 
   <!-- Header -->
-  <div style="margin-bottom:28px;">
+  <div style="margin-bottom:24px;">
     <div class="section-label">Monthly Overview</div>
     <h2 id="overview-heading" style="font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:800;color:var(--navy-deep);margin-bottom:6px;">Where We Are Right Now</h2>
   </div>
 
-  <!-- 4 Stat Cards -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;" id="overview-cards">
-  </div>
-
-  <!-- Timeline -->
-  <div class="section-label" style="margin-top:8px;">Project Timeline</div>
-  <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow-sm);">
-    <div id="overview-timeline"></div>
-  </div>
-
-
-
-</div>
-</div><!-- /page-overview -->
-
-<div class="page" id="page-budget">
-
   <!-- QBO Update Banner -->
-  <div id="qbo-banner" style="display:none;background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;border-radius:8px;padding:10px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:.85rem;">
+  <div id="qbo-banner" style="display:none;background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;border-radius:8px;padding:10px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;font-size:.85rem;">
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="font-size:1.1rem;">✅</span>
       <span>All numbers are up to date as of <strong id="qbo-banner-date">—</strong></span>
@@ -665,7 +647,10 @@
     <span style="opacity:.7;font-size:.75rem;font-family:Montserrat,sans-serif;letter-spacing:.05em;">SOURCE: QUICKBOOKS</span>
   </div>
 
-  <!-- Overall + Phase Progress -->
+  <!-- 4 Stat Cards -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;" id="overview-cards"></div>
+
+  <!-- Overall Budget Progress -->
   <div class="progress-section">
     <div class="progress-header">
       <span class="progress-title">Overall Budget &nbsp;<span style="font-weight:400;opacity:.7;font-size:.78rem;" id="total-budget-label"></span></span>
@@ -681,11 +666,40 @@
     </div>
   </div>
 
-  <!-- Phase Breakdown -->
-  <div class="section-label" style="margin-top:8px;">Phase Breakdown</div>
-  <div id="qbo-phase-breakdown"></div>
+  <!-- Project Schedule Timeline Bar -->
+  <div class="progress-section" style="margin-top:-8px;" id="schedule-bar-section">
+    <div class="progress-header" style="margin-bottom:10px;">
+      <span class="progress-title">Project Schedule &nbsp;<span id="schedule-year-label" style="font-weight:400;opacity:.7;font-size:.78rem;"></span></span>
+      <span id="schedule-status-badge" style="font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:4px;font-family:Montserrat,sans-serif;"></span>
+    </div>
+    <!-- Bar with project deadline markers -->
+    <div style="position:relative;margin:0 4px;">
+      <!-- Track -->
+      <div style="height:18px;background:var(--ice-pale);border-radius:100px;border:1px solid var(--border);position:relative;overflow:visible;">
+        <!-- Completed fill -->
+        <div id="schedule-completed-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--navy),var(--sky));border-radius:100px;transition:width .7s;position:relative;z-index:1;"></div>
+        <!-- Deadline markers injected by JS -->
+        <div id="schedule-deadline-markers"></div>
+        <!-- Today marker -->
+        <div id="schedule-today-marker" style="position:absolute;top:-5px;bottom:-5px;width:3px;background:#c47f18;border-radius:2px;z-index:3;display:none;">
+          <div id="schedule-today-label" style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:.6rem;font-weight:700;color:#c47f18;font-family:Montserrat,sans-serif;white-space:nowrap;"></div>
+        </div>
+      </div>
+      <!-- Deadline labels injected by JS -->
+      <div id="schedule-deadline-labels" style="position:relative;height:28px;margin-top:2px;"></div>
+    </div>
+    <div class="progress-meta" style="margin-top:4px;">
+      <span id="schedule-start-label">Jan</span>
+      <span id="schedule-meta-center" style="font-weight:600;color:var(--navy);"></span>
+      <span id="schedule-end-label">Dec</span>
+    </div>
+  </div>
 
+  <!-- Project Timeline + Budget (merged) -->
+  <div class="section-label" style="margin-top:8px;">Project Timeline & Budget</div>
+  <div id="overview-timeline"></div>
 
+  <div id="qbo-phase-breakdown" style="display:none;"></div>
 
   <!-- Report Info -->
   <div id="qbo-report-info" style="margin-top:16px;padding:10px 16px;background:var(--off-white);border-radius:8px;border:1px solid var(--border);font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
@@ -693,7 +707,8 @@
     <span id="qbo-report-date">Budget data sourced from QuickBooks. Last updated: —</span>
   </div>
 
-</div><!-- /page-budget -->
+</div>
+</div><!-- /page-overview -->
 
 
 
@@ -1388,9 +1403,7 @@ function switchPage(page) {
   document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t => {
     const txt = t.textContent.toLowerCase();
-    if (page === 'budget' && txt.includes('budget')) t.classList.add('active');
-    else if (page === 'volunteers' && txt.includes('vol')) t.classList.add('active');
-    else if (page === 'overview' && txt.includes('overview')) t.classList.add('active');
+    if (page === 'overview' && (txt.includes('overview') || txt.includes('project'))) t.classList.add('active');
   });
   if (page === 'volunteers') renderVolAll();
   if (page === 'overview') renderOverview();
@@ -2206,14 +2219,14 @@ function renderOverview() {
       + '</div>';
   }).join('');
 
-  // ── Completion-based Timeline ───────────────────────────
+  // ── Merged Timeline + Budget ────────────────────────────────
   var PHASE_COLORS = ['#2b4560', '#c05f3c', '#2a7a5a'];
   var tHtml = '';
 
   PHASE_SCHEDULE.forEach(function(ph, pi) {
     var phColor = PHASE_COLORS[pi];
 
-    // Count total and checked items for this phase
+    // Count completion
     var totalItems = 0, checkedItems = 0;
     (ph.projects || []).forEach(function(proj, prIdx) {
       var details = (typeof proj === 'object' && proj.details) ? proj.details : [];
@@ -2222,74 +2235,140 @@ function renderOverview() {
         if (completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx]) checkedItems++;
       });
     });
-
     var pct = totalItems > 0 ? Math.round(checkedItems / totalItems * 100) : 0;
     var hasProjects = ph.projects && ph.projects.length > 0;
     var shortName = ph.name.replace(/Phase \d+: /, '');
     var status = checkedItems === 0 ? 'NOT STARTED' : checkedItems === totalItems ? 'COMPLETE' : 'IN PROGRESS';
     var statusColor = status === 'COMPLETE' ? '#2a7a5a' : status === 'IN PROGRESS' ? '#c47f18' : '#6c757d';
 
-    tHtml += '<div style="margin-bottom:20px;">';
+    // QBO budget data for this phase
+    var phBudget = ph.budget || 0;
+    var phSpent = 0;
+    if (qboData && qboData.length > pi) phSpent = qboData[pi].spent || 0;
+    var phPct = phBudget > 0 ? Math.min(Math.round(phSpent / phBudget * 100), 100) : 0;
+    var budgetStatus = phSpent === 0 ? 'NOT STARTED' : phSpent > phBudget ? 'AT RISK' : phPct > 80 ? 'WATCH' : 'ON TRACK';
+    var budgetStatusColor = budgetStatus === 'NOT STARTED' ? '#6c757d' : budgetStatus === 'AT RISK' ? '#dc3545' : budgetStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
 
-    // Phase header row with arrow + title + status badge
-    tHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
-    tHtml += '<div style="display:flex;align-items:center;gap:6px;cursor:'+(hasProjects?'pointer':'default')+'" '+(hasProjects?'onclick="toggleTimelinePhase('+pi+')"':'')+' >';
-    if (hasProjects) tHtml += '<span id="tl-arrow-'+pi+'" style="font-size:.55rem;color:'+phColor+';transition:transform .2s;transform:rotate(-90deg);">&#9660;</span>';
+    var phId = 'tl-phase-' + pi;
+
+    // ── Phase card ──
+    tHtml += '<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-sm);">';
+
+    // Phase header — clickable to expand
+    tHtml += '<div data-phid="'+phId+'" onclick="toggleMergedPhase(this.dataset.phid)" style="background:'+phColor+';padding:13px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">';
+    tHtml += '<div style="display:flex;align-items:center;gap:8px;">';
+    tHtml += '<span id="'+phId+'-arrow" style="color:#fff;font-size:.6rem;transition:transform .2s;transform:rotate(-90deg);">&#9660;</span>';
     tHtml += '<div>';
-    tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:'+phColor+';">Phase '+(pi+1)+'</div>';
-    tHtml += '<div style="font-size:.9rem;font-weight:700;color:var(--navy-deep);">'+shortName+'</div>';
+    tHtml += '<div style="font-family:Montserrat,sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.75);">Phase '+(pi+1)+' of 3</div>';
+    tHtml += '<div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:.95rem;color:#fff;">'+shortName+'</div>';
     tHtml += '</div></div>';
-    // Right side: checked count + status badge
-    tHtml += '<div style="display:flex;align-items:center;gap:10px;">';
-    tHtml += '<span style="font-size:.8rem;color:var(--text-muted);">'+checkedItems+' / '+totalItems+' complete</span>';
-    tHtml += '<span style="background:'+statusColor+';color:#fff;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:4px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+status+'</span>';
+    tHtml += '<div style="display:flex;align-items:center;gap:12px;">';
+    // Completion badge
+    tHtml += '<span style="font-size:.78rem;color:rgba(255,255,255,.8);">'+checkedItems+'/'+totalItems+' tasks</span>';
+    tHtml += '<span style="background:'+statusColor+';color:#fff;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:4px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+status+'</span>';
     tHtml += '</div></div>';
 
-    // Progress bar
-    tHtml += '<div style="height:20px;background:#e8edf2;border-radius:10px;overflow:hidden;position:relative;">';
-    if (pct > 0) {
-      tHtml += '<div style="height:100%;width:'+pct+'%;background:'+phColor+';border-radius:10px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;">';
-      if (pct > 12) tHtml += '<span style="font-size:.68rem;font-weight:700;color:#fff;font-family:Montserrat,sans-serif;">'+pct+'%</span>';
-      tHtml += '</div>';
-    }
-    if (pct === 0) {
-      tHtml += '<div style="position:absolute;inset:0;display:flex;align-items:center;padding-left:10px;">';
-      tHtml += '<span style="font-size:.68rem;color:#aaa;font-family:Montserrat,sans-serif;">0%</span>';
-      tHtml += '</div>';
-    }
+    // Completion progress bar
+    tHtml += '<div style="height:6px;background:#e8edf2;">';
+    tHtml += '<div style="height:6px;width:'+pct+'%;background:'+phColor+';transition:width .5s;"></div>';
     tHtml += '</div>';
 
-    // Projects dropdown
-    if (hasProjects) {
-      tHtml += '<div id="tl-projects-'+pi+'" style="display:none;">';
-      tHtml += '<div style="display:flex;">';
-      tHtml += '<div style="padding:8px 12px 10px 14px;border-left:3px solid '+phColor+';margin-left:8px;margin-top:8px;min-width:0;">';
-      ph.projects.forEach(function(proj, prIdx) {
-        var projName = typeof proj === 'object' ? proj.name : proj;
-        var projDetails = (typeof proj === 'object' && proj.details && proj.details.length) ? proj.details : [];
-        tHtml += '<div style="padding:4px 0 2px;font-size:.82rem;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;">';
-        tHtml += '<span style="width:6px;height:6px;border-radius:50%;background:'+phColor+';flex-shrink:0;display:inline-block;"></span>';
-        tHtml += projName + '</div>';
+    // Phase body
+    tHtml += '<div id="'+phId+'-body" style="display:none;">';
+
+    // Phase budget summary row
+    tHtml += '<div style="padding:10px 20px;background:var(--off-white);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">';
+    tHtml += '<span style="font-size:.8rem;color:var(--text-muted);">Phase Budget</span>';
+    tHtml += '<div style="display:flex;align-items:center;gap:12px;">';
+    tHtml += '<span style="font-size:.82rem;color:var(--text-muted);">'+fmt(phSpent)+' spent / '+fmt(phBudget)+' budget</span>';
+    if (phBudget > 0) {
+      tHtml += '<div style="width:80px;height:5px;background:#e8edf2;border-radius:3px;">';
+      tHtml += '<div style="height:5px;width:'+phPct+'%;background:'+phColor+';border-radius:3px;"></div></div>';
+    }
+    tHtml += '<span style="background:'+budgetStatusColor+';color:#fff;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:3px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+budgetStatus+'</span>';
+    tHtml += '</div></div>';
+
+    // Projects
+    (ph.projects || []).forEach(function(proj, prIdx) {
+      var projName = typeof proj === 'object' ? proj.name : proj;
+      var projDetails = (typeof proj === 'object' && proj.details && proj.details.length) ? proj.details : [];
+      var prBudget = (typeof proj === 'object') ? (proj.budget || 0) : 0;
+      var prMarket = (typeof proj === 'object') ? (proj.market || 0) : 0;
+      var isContingency = projName === 'Contingency';
+
+      // QBO spend for this project
+      var prSpent = 0;
+      if (qboData && qboData.length > pi) {
+        var qboProj = (qboData[pi].projects || []).find(function(p){ return p.name === projName; });
+        if (qboProj) prSpent = qboProj.spent || 0;
+      }
+      var prPct = prBudget > 0 ? Math.min(Math.round(prSpent / prBudget * 100), 100) : 0;
+      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent > prBudget ? 'AT RISK' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'AT RISK' ? '#dc3545' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+
+      var hasDetails = projDetails.length > 0;
+      var prId = 'tl-proj-'+pi+'-'+prIdx;
+
+      tHtml += '<div style="border-bottom:1px solid var(--border);">';
+
+      // Project row — left side: arrow + name + deadline | right side: budget + status
+      tHtml += '<div data-prid="'+prId+'" style="padding:10px 20px 10px 28px;display:flex;justify-content:space-between;align-items:center;'+(hasDetails?'cursor:pointer;':'')+(prSpent===0?'background:var(--off-white);':'')+'" '+(hasDetails?'onclick="toggleMergedProject(this.dataset.prid)"':'')+' >';
+      tHtml += '<div style="display:flex;align-items:center;gap:7px;">';
+      if (hasDetails) tHtml += '<span id="'+prId+'-arrow" style="font-size:.55rem;color:'+phColor+';transition:transform .2s;transform:rotate(-90deg);">&#9660;</span>';
+      else tHtml += '<span style="width:10px;display:inline-block;"></span>';
+      tHtml += '<div>';
+      tHtml += '<div style="font-weight:600;font-size:.88rem;color:var(--navy);">'+projName+'</div>';
+      if (proj.deadline) tHtml += '<div style="font-size:.72rem;color:var(--text-muted);">Due: '+proj.deadline+'</div>';
+      tHtml += '</div></div>';
+      // Right: budget info + status
+      tHtml += '<div style="display:flex;align-items:center;gap:12px;">';
+      if (!isContingency) {
+        tHtml += '<div style="text-align:right;">';
+        tHtml += '<div style="font-size:.8rem;color:var(--text-muted);">'+fmt(prSpent)+' / '+fmt(prBudget)+'</div>';
+        if (prMarket > 0) tHtml += '<div style="font-size:.72rem;color:#c05f3c;">Market: '+fmt(prMarket)+'</div>';
+        if (prBudget > 0) {
+          tHtml += '<div style="width:80px;height:4px;background:#e8edf2;border-radius:2px;margin-top:3px;">';
+          tHtml += '<div style="height:4px;width:'+prPct+'%;background:'+phColor+';border-radius:2px;"></div></div>';
+        }
+        tHtml += '</div>';
+        if (prStatus) tHtml += '<span style="background:'+prStatusColor+';color:#fff;font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:3px;font-family:Montserrat,sans-serif;white-space:nowrap;">'+prStatus+'</span>';
+      } else {
+        tHtml += '<span style="font-size:.82rem;color:var(--text-muted);">'+fmt(prBudget)+'</span>';
+      }
+      tHtml += '</div></div>';
+
+      // Detail items with checkboxes
+      if (hasDetails) {
+        tHtml += '<div id="'+prId+'-body" style="display:none;background:#fafcff;border-top:1px solid var(--border);">';
         projDetails.forEach(function(detail, dIdx) {
           var key = 'ph'+pi+'_pr'+prIdx+'_d'+dIdx;
           var checked = completedProjects[key] ? true : false;
+          var lastDash = detail.lastIndexOf(' — ');
+          var dName = lastDash > -1 ? detail.substring(0, lastDash) : detail;
+          var dAmt  = lastDash > -1 ? detail.substring(lastDash + 3) : '';
           var strikeStyle = checked ? 'text-decoration:line-through;color:#aaa;' : '';
-          tHtml += '<div style="padding:3px 14px 3px 14px;font-size:.78rem;display:flex;align-items:center;gap:8px;cursor:pointer;" data-key="'+key+'" onclick="handleCheckClick(this,event)">' + '';
+          tHtml += '<div data-key="'+key+'" onclick="handleCheckClick(this,event)" style="padding:7px 20px 7px 44px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f4f8;cursor:pointer;">';
+          tHtml += '<div style="display:flex;align-items:center;gap:8px;">';
           tHtml += '<div style="width:15px;height:15px;border-radius:3px;border:2px solid '+(checked?phColor:'#ccc')+';background:'+(checked?phColor:'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;">';
           if (checked) tHtml += '<span style="color:#fff;font-size:.6rem;font-weight:900;">&#10003;</span>';
           tHtml += '</div>';
-          var detailName = detail.lastIndexOf(' — ') > -1 ? detail.substring(0, detail.lastIndexOf(' — ')) : detail;
-          tHtml += '<span style="'+strikeStyle+'color:var(--text-muted);">'+detailName+'</span>';
+          tHtml += '<span style="'+strikeStyle+'font-size:.78rem;color:var(--text-muted);">'+dName+'</span>';
+          tHtml += '</div>';
+          // dAmt intentionally not shown — budget detail at project level only
           tHtml += '</div>';
         });
-      });
-      tHtml += '</div></div></div>';
-    }
+        tHtml += '</div>';
+      }
 
-    tHtml += '</div>'; // close phase block
+      tHtml += '</div>'; // close project
+    });
+
+    tHtml += '</div>'; // close phase body
+    tHtml += '</div>'; // close phase card
   });
 
   document.getElementById('overview-timeline').innerHTML = tHtml;
+  renderScheduleBar();
 
   // Restore highlight text
   try {
@@ -2325,24 +2404,56 @@ function toggleProjectComplete(key, event) {
 
 
 function renderTimelineOnly() {
-  // Re-render just the timeline section preserving open/closed state
-  var openStates = {};
-  for (var i = 0; i < 3; i++) {
-    var el = document.getElementById('tl-projects-' + i);
-    if (el) openStates[i] = el.style.display !== 'none';
+  // Save ALL open/closed states for phases AND projects before re-rendering
+  var phaseStates = {};
+  var projStates  = {};
+  for (var pi = 0; pi < 3; pi++) {
+    var phEl = document.getElementById('tl-phase-' + pi + '-body');
+    if (phEl) phaseStates[pi] = phEl.style.display !== 'none';
+    for (var prIdx = 0; prIdx < 10; prIdx++) {
+      var prEl = document.getElementById('tl-proj-' + pi + '-' + prIdx + '-body');
+      if (prEl) projStates[pi + '-' + prIdx] = prEl.style.display !== 'none';
+    }
   }
   renderOverview();
-  // Restore open/closed state
-  for (var i = 0; i < 3; i++) {
-    if (openStates[i]) {
-      var body = document.getElementById('tl-projects-' + i);
-      var arrow = document.getElementById('tl-arrow-' + i);
-      if (body) body.style.display = 'block';
+  renderScheduleBar();
+  // Restore phase states
+  for (var pi = 0; pi < 3; pi++) {
+    if (phaseStates[pi]) {
+      var body  = document.getElementById('tl-phase-' + pi + '-body');
+      var arrow = document.getElementById('tl-phase-' + pi + '-arrow');
+      if (body)  body.style.display = 'block';
       if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+    // Restore project states
+    for (var prIdx = 0; prIdx < 10; prIdx++) {
+      var key = pi + '-' + prIdx;
+      if (projStates[key]) {
+        var prBody  = document.getElementById('tl-proj-' + pi + '-' + prIdx + '-body');
+        var prArrow = document.getElementById('tl-proj-' + pi + '-' + prIdx + '-arrow');
+        if (prBody)  prBody.style.display = 'block';
+        if (prArrow) prArrow.style.transform = 'rotate(0deg)';
+      }
     }
   }
 }
 
+function toggleMergedPhase(phId) {
+  var body = document.getElementById(phId + '-body');
+  var arrow = document.getElementById(phId + '-arrow');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+function toggleMergedProject(prId) {
+  var body = document.getElementById(prId + '-body');
+  var arrow = document.getElementById(prId + '-arrow');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
 function toggleTimelinePhase(idx) {
   var body = document.getElementById('tl-projects-' + idx);
   var arrow = document.getElementById('tl-arrow-' + idx);
@@ -2520,7 +2631,134 @@ function renderPhaseSummaryTable() {
   el.innerHTML = html;
 }
 
-function renderAll(){renderKPI();renderProgress();renderQBOBreakdown();renderPhaseSummaryTable();renderHealth();}
+
+function renderScheduleBar() {
+  var today = new Date();
+  var currentYear = today.getFullYear();
+
+  // Clamp to project years
+  var displayYear = Math.max(2026, Math.min(2028, currentYear));
+
+  // Year boundaries
+  var yearStart = new Date(displayYear, 0, 1);   // Jan 1
+  var yearEnd   = new Date(displayYear, 11, 31); // Dec 31
+  var yearMs    = yearEnd - yearStart;
+
+  // Collect projects for this year
+  var yearProjects = [];
+  PHASE_SCHEDULE.forEach(function(ph, pi) {
+    (ph.projects || []).forEach(function(proj, prIdx) {
+      if (!proj.deadline) return;
+      var parts = proj.deadline.split('/');
+      var dl = new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
+      if (dl.getFullYear() !== displayYear) return;
+      var details = proj.details || [];
+      var allDone = details.length > 0 && details.every(function(d, dIdx) {
+        return completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx];
+      });
+      yearProjects.push({
+        name: proj.name,
+        deadline: dl,
+        done: allDone,
+        pct: (dl - yearStart) / yearMs * 100,
+        pi: pi, prIdx: prIdx, details: details
+      });
+    });
+  });
+
+  // Sort by deadline
+  yearProjects.sort(function(a,b){ return a.deadline - b.deadline; });
+
+  // Today's position within this year
+  var todayPct = Math.max(0, Math.min((today - yearStart) / yearMs * 100, 100));
+
+  // Completion fill = position of last completed project deadline (or 0)
+  var fillPct = 0;
+  yearProjects.forEach(function(p) {
+    if (p.done) fillPct = Math.max(fillPct, p.pct);
+  });
+  // If today hasn't reached first deadline yet, fill is 0
+  var fillEl = document.getElementById('schedule-completed-fill');
+  if (fillEl) fillEl.style.width = fillPct.toFixed(1) + '%';
+
+  // Today marker
+  var markerEl = document.getElementById('schedule-today-marker');
+  var labelEl  = document.getElementById('schedule-today-label');
+  if (markerEl) {
+    if (currentYear === displayYear) {
+      markerEl.style.display = 'block';
+      markerEl.style.left = todayPct.toFixed(1) + '%';
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      if (labelEl) labelEl.textContent = months[today.getMonth()];
+    } else {
+      markerEl.style.display = 'none';
+    }
+  }
+
+  // Deadline markers on the bar
+  var markersHtml = '';
+  var labelsHtml  = '';
+  var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  yearProjects.forEach(function(p, idx) {
+    var pct = p.pct.toFixed(1);
+    var isPast = p.deadline < today;
+    var color = p.done ? '#2a7a5a' : isPast ? '#dc3545' : '#2b4560';
+    var labelMonth = MONTHS_SHORT[p.deadline.getMonth()];
+
+    // Marker line on bar
+    markersHtml += '<div style="position:absolute;top:-3px;bottom:-3px;left:'+pct+'%;width:2px;background:'+color+';z-index:2;border-radius:1px;transform:translateX(-50%);"></div>';
+    // Diamond dot on bar
+    markersHtml += '<div style="position:absolute;top:50%;left:'+pct+'%;width:10px;height:10px;background:'+color+';border:2px solid #fff;border-radius:2px;transform:translate(-50%,-50%) rotate(45deg);z-index:3;"></div>';
+
+    // Label below bar — alternate above/below to avoid overlap
+    var topPos = (idx % 2 === 0) ? '0px' : '14px';
+    // Shorten long names
+    var shortName = p.name.length > 22 ? p.name.substring(0,20)+'…' : p.name;
+    labelsHtml += '<div style="position:absolute;left:'+pct+'%;transform:translateX(-50%);top:'+topPos+';text-align:center;white-space:nowrap;">';
+    labelsHtml += '<span style="font-size:.6rem;color:'+color+';font-weight:700;font-family:Montserrat,sans-serif;">'+(p.done ? '✓ ' : '')+labelMonth+'</span>';
+    labelsHtml += '</div>';
+  });
+
+  var markersEl = document.getElementById('schedule-deadline-markers');
+  var labelsElm = document.getElementById('schedule-deadline-labels');
+  if (markersEl) markersEl.innerHTML = markersHtml;
+  if (labelsElm) labelsElm.innerHTML = labelsHtml;
+
+  // Status badge
+  var overdueCount = yearProjects.filter(function(p){ return !p.done && p.deadline < today; }).length;
+  var doneCount    = yearProjects.filter(function(p){ return p.done; }).length;
+  var statusTxt, statusBg;
+  if (overdueCount > 0) {
+    statusTxt = overdueCount + ' PAST DUE';
+    statusBg = '#dc3545';
+  } else if (doneCount === yearProjects.length && yearProjects.length > 0) {
+    statusTxt = 'ALL COMPLETE';
+    statusBg = '#2a7a5a';
+  } else {
+    statusTxt = 'ON SCHEDULE';
+    statusBg = '#2a7a5a';
+  }
+
+  var badgeEl = document.getElementById('schedule-status-badge');
+  if (badgeEl) { badgeEl.textContent = statusTxt; badgeEl.style.background = statusBg; badgeEl.style.color = '#fff'; }
+
+  var yearLabelEl = document.getElementById('schedule-year-label');
+  if (yearLabelEl) yearLabelEl.textContent = displayYear;
+
+  var startEl = document.getElementById('schedule-start-label');
+  var endEl   = document.getElementById('schedule-end-label');
+  if (startEl) startEl.textContent = 'Jan ' + displayYear;
+  if (endEl)   endEl.textContent   = 'Dec ' + displayYear;
+
+  var metaEl = document.getElementById('schedule-meta-center');
+  if (metaEl) {
+    metaEl.textContent = doneCount + ' of ' + yearProjects.length + ' projects complete';
+    metaEl.style.color = overdueCount > 0 ? '#dc3545' : 'var(--navy)';
+  }
+}
+
+function renderAll(){renderKPI();renderProgress();renderQBOBreakdown();renderPhaseSummaryTable();renderHealth();renderOverview();}
 
 // inp-date removed (QBO-driven budget)
 // vol-date removed
@@ -2664,8 +2902,8 @@ loadFromAPI().then(function() {
       })
       .catch(function(e) { console.error('Public data load failed:', e); });
   } else {
-    switchPage('overview');
     renderAll();
+    switchPage('overview');
     setProjectionMode(projectionMode);
     renderCategorySelects();
   }
