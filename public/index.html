@@ -2909,43 +2909,41 @@ async function saveWebhookUrl() {
   }
 }
 
-loadFromAPI().then(function() {
+// On public page skip loadFromAPI (requires auth) and go straight to public data
+if (IS_PUBLIC) {
   initAuthMode();
-  if (IS_PUBLIC) {
-    // Public mode — load from public API instead
-    fetch('/api/public-data')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (d.ok && d.data) {
-          function parseValP(v) { return typeof v === 'string' ? JSON.parse(v) : v; }
-          if (d.data.lb_expenses2)         expenses          = parseValP(d.data.lb_expenses2);
-          if (d.data.lb_year_budgets)      yearBudgets       = parseValP(d.data.lb_year_budgets);
-          if (d.data.lb_phases)            phases            = parseValP(d.data.lb_phases);
-          if (d.data.lb_projects)          projects          = parseValP(d.data.lb_projects);
-          if (d.data.lb_qbo_data)          qboData           = parseValP(d.data.lb_qbo_data);
-          if (d.data.lb_completed_projects) completedProjects = parseValP(d.data.lb_completed_projects);
-          if (d.data.lb_qbo_updated) {
-            var rawDate = d.data.lb_qbo_updated;
-            if (typeof rawDate === 'string') {
-              try { rawDate = JSON.parse(rawDate); } catch(e) {}
-            }
-            window._qboUpdated = String(rawDate).replace(/"/g,'');
-            if (!window._qboUpdated.includes('T')) window._qboUpdated += 'T12:00:00';
-          }
-          // lb_volunteers intentionally skipped — data is hardcoded
-          _dataLoaded = false; // prevent saves from public view
+  fetch('/api/public-data')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.ok && d.data) {
+        function parseValP(v) { return typeof v === 'string' ? JSON.parse(v) : v; }
+        if (d.data.lb_expenses2)          expenses          = parseValP(d.data.lb_expenses2);
+        if (d.data.lb_year_budgets)       yearBudgets       = parseValP(d.data.lb_year_budgets);
+        if (d.data.lb_phases)             phases            = parseValP(d.data.lb_phases);
+        if (d.data.lb_projects)           projects          = parseValP(d.data.lb_projects);
+        if (d.data.lb_qbo_data)           qboData           = parseValP(d.data.lb_qbo_data);
+        if (d.data.lb_completed_projects) completedProjects = parseValP(d.data.lb_completed_projects);
+        if (d.data.lb_qbo_updated) {
+          var rawDate = d.data.lb_qbo_updated;
+          if (typeof rawDate === 'string') { try { rawDate = JSON.parse(rawDate); } catch(e) {} }
+          window._qboUpdated = String(rawDate).replace(/"/g,'');
+          if (!window._qboUpdated.includes('T')) window._qboUpdated += 'T12:00:00';
         }
-        renderAll();
-        switchPage('overview');
-      })
-      .catch(function(e) { console.error('Public data load failed:', e); });
-  } else {
+        _dataLoaded = false; // prevent saves from public view
+      }
+      renderAll();
+      switchPage('overview');
+    })
+    .catch(function(e) { console.error('Public data load failed:', e); });
+} else {
+  loadFromAPI().then(function() {
+    initAuthMode();
     renderAll();
     switchPage('overview');
     setProjectionMode(projectionMode);
     renderCategorySelects();
-  }
-});
+  });
+}
 </script>
 
 <!-- ── Notify Modal ─────────────────────────────── -->
