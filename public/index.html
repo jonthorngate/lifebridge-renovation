@@ -2281,8 +2281,9 @@ function renderOverview() {
       // Overflow spending spills into contingency
       var overflow = prSpent > prBudget ? prSpent - prBudget : 0;
       var effectiveSpent = Math.min(prSpent, prBudget);
-      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent >= prBudget ? 'BUDGET MET' : prPct > 80 ? 'WATCH' : 'ON TRACK';
-      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'BUDGET MET' ? '#2b4560' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+      var allDetailsDone = projDetails.length > 0 && projDetails.every(function(d, dIdx) { return completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx]; });
+      var prStatus = isContingency ? '' : allDetailsDone ? 'DONE' : prSpent === 0 ? 'NOT STARTED' : prSpent >= prBudget ? 'BUDGET MET' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prStatusColor = prStatus === 'DONE' ? '#1a5fa8' : prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'BUDGET MET' ? '#2b4560' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
 
       var hasDetails = projDetails.length > 0;
       var prId = 'tl-proj-'+pi+'-'+prIdx;
@@ -2529,8 +2530,9 @@ function renderQBOBreakdown() {
       // Overflow spending spills into contingency
       var overflow = prSpent > prBudget ? prSpent - prBudget : 0;
       var effectiveSpent = Math.min(prSpent, prBudget);
-      var prStatus = isContingency ? '' : prSpent === 0 ? 'NOT STARTED' : prSpent >= prBudget ? 'BUDGET MET' : prPct > 80 ? 'WATCH' : 'ON TRACK';
-      var prStatusColor = prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'BUDGET MET' ? '#2b4560' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
+      var projDets = (proj.details || []); var allDetailsDone = projDets.length > 0 && projDets.every(function(d, dIdx) { return completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx]; });
+      var prStatus = isContingency ? '' : allDetailsDone ? 'DONE' : prSpent === 0 ? 'NOT STARTED' : prSpent >= prBudget ? 'BUDGET MET' : prPct > 80 ? 'WATCH' : 'ON TRACK';
+      var prStatusColor = prStatus === 'DONE' ? '#1a5fa8' : prStatus === 'NOT STARTED' ? '#6c757d' : prStatus === 'BUDGET MET' ? '#2b4560' : prStatus === 'WATCH' ? '#c47f18' : '#2a7a5a';
       var hasDetails = proj.details && proj.details.length > 0;
       var prId = 'qbo-proj-'+pi+'-'+prIdx;
 
