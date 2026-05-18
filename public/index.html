@@ -803,7 +803,7 @@ let subcatBudgets = {};
 let expenses = [];
 let qboData = []; // loaded from lb_qbo_data
 
-let yearBudgets = { 2026: 192500, 2027: 197500, 2028: 160000 };
+let yearBudgets = { 2026: 200000, 2027: 200000, 2028: 150000 };
 let deleteIndex = null;
 let chartInstance = null;
 
@@ -1225,26 +1225,25 @@ var TOTAL_VOLUNTEER_SAVINGS = 41000; // fallback — overridden by completion-ba
 
 // ── Phase schedule & project details ────────────────────────
 var PHASE_SCHEDULE = [
-  { name: 'Phase 1: Planning, 473 Demo, Exterior Rebuild & Leased Space', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12, budget: 192500,
+  { name: 'Phase 1: Planning, 473 Demo, Exterior Rebuild & Leased Space', color: '#2b4560', startYear: 2026, startMonth: 1, endYear: 2026, endMonth: 12, budget: 200000,
     projects: [
-      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 10000, market: 20000, details: [
-          'Demo & Misc. — $2,000',
-          'Framing for New Walls + Layout — $2,500',
-          'Drywall — Hang, Tape, Sand — $5,500',
+      { name: 'Leased Space Demo + Rough Construction', deadline: '5/31/2026', budget: 8000, market: 20000, details: [
+          'Demo & Misc. — $2,500',
+          'Framing for New Walls + Layout — $5,500',
         ]
       },
-      { name: 'Leased Space Mechanicals', deadline: '6/30/2026', budget: 17000, market: 30000, details: [
-          'Plumbing — Bathroom + Kitchenette — $10,000',
-          'Electrical + Low Voltage — $3,000',
+      { name: 'Leased Space Mechanicals', deadline: '6/30/2026', budget: 18000, market: 30000, details: [
+          'Plumbing — Bathroom + Kitchenette — $10,500',
+          'Electrical + Low Voltage — $3,500',
           'HVAC — Moving for Layout — $4,000',
         ]
       },
-      { name: 'Leased Space Finishing', deadline: '8/15/2026', budget: 26000, market: 50000, details: [
-          'Flooring (carpet tile, wood, polished concrete) — $5,000',
-          'Painting — $2,000',
-          'Room Furnishings + AV — $5,000',
+      { name: 'Leased Space Finishing', deadline: '8/15/2026', budget: 33500, market: 55000, details: [
+          'Flooring (carpet tile, wood, polished concrete) — $4,500',
+          'Drywall + Paint — $7,500',
+          'Room Furnishings + AV — $5,500',
           'Window + Door — $4,000',
-          'Finish Construction - Ramp, Alcove, Office Wall, Island, Trim — $10,000',
+          'Finish Construction - Ramp, Alcove, Office Wall, Island, Trim, Cabinets — $12,000',
         ]
       },
       { name: '473 Site Work + Utilities', deadline: '8/31/2026', budget: 29000, market: 35000, details: [
@@ -1269,14 +1268,14 @@ var PHASE_SCHEDULE = [
       },
       { name: 'Admin & Management', deadline: '', budget: 39500, market: 60000, details: [
           'Project Planning, Design & Management — $32,000',
-          'Approvals and Permits — $5,000',
-          'Insurance, Safety & Misc — $2,500',
+          'Approvals and Permits — $6,000',
+          'Insurance, Safety & Misc — $1,500',
         ]
       },
-      { name: 'Contingency', deadline: '', budget: 13000, market: 0, details: [] },
+      { name: 'Contingency', deadline: '', budget: 14000, market: 0, details: [] },
     ]
   },
-  { name: 'Phase 2: Connecting Addition + 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12, budget: 197500,
+  { name: 'Phase 2: Connecting Addition + 473 Remodel', color: '#c05f3c', startYear: 2027, startMonth: 1, endYear: 2027, endMonth: 12, budget: 200000,
     projects: [
       { name: 'Addition Shell', deadline: '3/31/2027', budget: 55000, market: 65000, details: [
           'Wall + Ceiling Structure (steel studs + truss) — $15,000',
@@ -1310,39 +1309,39 @@ var PHASE_SCHEDULE = [
           'Move Electrical and Gas Lines — $3,000',
         ]
       },
-      { name: 'Facade Finishing', deadline: '10/31/2027', budget: 27500, market: 30000, details: [
-          'Addition Double Door / Storefront System — $11,000',
-          'Lower Facade Brick Veneer — $6,000',
-          'Paneling or Stucco — $3,500',
-          'New Awnings (fabricate + install) — $5,000',
+      { name: 'Facade Finishing', deadline: '10/31/2027', budget: 28000, market: 30000, details: [
+          'Addition Double Door / Storefront System — $12,000',
+          'Lower Facade Brick Veneer — $5,000',
+          'Paneling or Stucco — $3,000',
+          'New Awnings (fabricate + install) — $6,000',
           'New Lighting + Demo Existing Awning — $2,000',
         ]
       },
-      { name: 'Admin & Management', deadline: '', budget: 28000, market: 40000, details: [
+      { name: 'Admin & Management', deadline: '', budget: 29000, market: 40000, details: [
           'Plan Approval + Permits — $2,000',
-          'Project Planning, Design & Management — $24,000',
+          'Project Planning, Design & Management — $25,000',
           'Insurance + Misc Admin — $2,000',
         ]
       },
-      { name: 'Contingency', deadline: '', budget: 13000, market: 0, details: [] },
+      { name: 'Contingency', deadline: '', budget: 14000, market: 0, details: [] },
     ]
   },
-  { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12, budget: 160000,
+  { name: 'Phase 3: Remodel Church Building', color: '#2a7a5a', startYear: 2028, startMonth: 1, endYear: 2028, endMonth: 12, budget: 150000,
     projects: [
-      { name: 'Move Bathrooms', deadline: '3/31/2028', budget: 27000, market: 40000, details: [
-          'Move Plumbing + Finishes — $7,000',
+      { name: 'Move Bathrooms', deadline: '3/31/2028', budget: 25000, market: 40000, details: [
+          'Move Plumbing + Finishes — $6,500',
           'Flooring + Replace Ceiling Tiles — $5,500',
-          'Demo + Framing, Drywall, Paint + HVAC Re-work — $7,500',
-          'Door Moving, Installs — $4,000',
+          'Demo + Framing, Drywall, Paint + HVAC Re-work — $7,000',
+          'Door Moving, Installs — $3,000',
           'Electrical — $3,000',
         ]
       },
-      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 24000, market: 32500, details: [
+      { name: 'Expand Lobby + Add Security Doors', deadline: '4/30/2028', budget: 21500, market: 32500, details: [
           'Hallway Security Doors + Glass Surround — $9,000',
-          'Convert Ceiling to Drywall (matched w/ hallway) — $4,000',
-          'Flooring (tile or other) — $4,000',
+          'Convert Ceiling to Drywall (matched w/ hallway) — $3,000',
+          'Flooring (tile or other) — $3,000',
           'Wall Finishing — $4,000',
-          'Finishing (trim, paint, misc.) — $3,000',
+          'Finishing (trim, paint, misc.) — $2,500',
         ]
       },
       { name: 'Cry Room + Prayer Room', deadline: '6/30/2028', budget: 21000, market: 30000, details: [
@@ -1369,13 +1368,13 @@ var PHASE_SCHEDULE = [
           'Add/Rework HVAC and Electrical — $2,000',
         ]
       },
-      { name: 'Admin & Management', deadline: '', budget: 28000, market: 40000, details: [
+      { name: 'Admin & Management', deadline: '', budget: 23000, market: 40000, details: [
           'Plan Approval + Permits — $2,000',
-          'Project Planning, Design & Management — $24,000',
-          'Insurance + Misc Admin — $2,000',
+          'Project Planning, Design & Management — $20,000',
+          'Insurance + Misc Admin — $1,000',
         ]
       },
-      { name: 'Contingency', deadline: '', budget: 11000, market: 0, details: [] },
+      { name: 'Contingency', deadline: '', budget: 10500, market: 0, details: [] },
     ]
   },
 ];
@@ -1411,34 +1410,10 @@ function switchPage(page) {
 
 function totalVolHours() { return 0; } // removed - no longer tracked
 function totalVolSavings() {
-  // Calculate savings from completed projects:
-  // For each completed project, savings = market cost - actual QBO spend
-  var savings = 0;
-  PHASE_SCHEDULE.forEach(function(phase, pi) {
-    (phase.projects || []).forEach(function(proj, prIdx) {
-      if (!proj.market || proj.market === 0) return; // skip contingency
-      // Check if this project is "complete" — all its detail items are checked
-      // For projects with no details, check a top-level key
-      var details = proj.details || [];
-      var isComplete = false;
-      if (details.length > 0) {
-        var allChecked = details.every(function(d, dIdx) {
-          return completedProjects['ph'+pi+'_pr'+prIdx+'_d'+dIdx];
-        });
-        isComplete = allChecked;
-      }
-      if (isComplete) {
-        // Get actual spend from QBO data
-        var actualSpent = 0;
-        if (qboData && qboData.length > pi) {
-          var qboProj = (qboData[pi].projects || []).find(function(p){ return p.name === proj.name; });
-          if (qboProj) actualSpent = qboProj.spent || 0;
-        }
-        savings += Math.max(0, proj.market - actualSpent);
-      }
-    });
-  });
-  return savings;
+  // Savings = actual spent x 1.45
+  // (Based on $800K market value / $550K budget = 1.45x multiplier)
+  var spent = totalSpent();
+  return Math.round(spent * 1.45);
 }
 
 function renderVolKPI() {
@@ -2208,7 +2183,7 @@ function renderOverview() {
       })(), color: '#2b4560' },
     { label: 'SPENT TO DATE', value: fmt(ts), sub: 'of ' + fmt(TOTAL_BUDGET) + ' total project budget', color: '#c05f3c' },
     { label: 'TOTAL VOLUNTEERS', value: totalVolPeople.toLocaleString(), sub: 'contributed across all projects', color: '#2a7a5a' },
-    { label: 'SAVINGS FROM VOLUNTEERS & CONTRIBUTIONS', value: fmt(totalVolSav), sub: 'saved through volunteers and donated materials', color: '#c47f18' },
+    { label: 'ESTIMATED SAVINGS', value: fmt(totalVolSav), sub: 'From Donated Time + Materials', color: '#c47f18' },
   ];
 
   document.getElementById('overview-cards').innerHTML = cards.map(function(c) {
@@ -2328,7 +2303,6 @@ function renderOverview() {
       if (!isContingency) {
         tHtml += '<div style="text-align:right;">';
         tHtml += '<div style="font-size:.8rem;color:var(--text-muted);">'+fmt(prSpent)+' / '+fmt(prBudget)+'</div>';
-        if (prMarket > 0) tHtml += '<div style="font-size:.72rem;color:#c05f3c;">Market: '+fmt(prMarket)+'</div>';
         if (prBudget > 0) {
           tHtml += '<div style="width:80px;height:4px;background:#e8edf2;border-radius:2px;margin-top:3px;">';
           tHtml += '<div style="height:4px;width:'+Math.min(prPct,100)+'%;background:'+(prSpent>=prBudget?'#2b4560':phColor)+';border-radius:2px;"></div></div>';
@@ -2574,9 +2548,6 @@ function renderQBOBreakdown() {
       html += '<div style="display:flex;align-items:center;gap:12px;">';
       html += '<div style="text-align:right;">';
       html += '<div style="font-size:.82rem;color:var(--text-muted);">Spent: '+fmt(prSpent)+' / '+fmt(prBudget)+'</div>';
-      if (proj.market && proj.market > 0) {
-        html += '<div style="font-size:.75rem;color:var(--text-muted);margin-top:2px;">Market: <span style="color:#c05f3c;font-weight:600;">'+fmt(proj.market)+'</span></div>';
-      }
       if (prBudget > 0) {
         html += '<div style="height:4px;width:100px;background:#e8edf2;border-radius:2px;margin-top:3px;"><div style="height:4px;width:'+prPct+'%;background:'+phColor+';border-radius:2px;"></div></div>';
       }
