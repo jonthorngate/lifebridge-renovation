@@ -644,7 +644,7 @@
       <span style="font-size:1.1rem;">✅</span>
       <span>All numbers are up to date as of <strong id="qbo-banner-date">—</strong></span>
     </div>
-    <span style="opacity:.7;font-size:.75rem;font-family:Montserrat,sans-serif;letter-spacing:.05em;">SOURCE: QUICKBOOKS</span>
+    
   </div>
 
   <!-- 4 Stat Cards -->
@@ -704,7 +704,7 @@
   <!-- Report Info -->
   <div id="qbo-report-info" style="margin-top:16px;padding:10px 16px;background:var(--off-white);border-radius:8px;border:1px solid var(--border);font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
     <span>📊</span>
-    <span id="qbo-report-date">Budget data sourced from QuickBooks. Last updated: —</span>
+    <span id="qbo-report-date">Budget Data: Last Updated —</span>
   </div>
 
 </div>
@@ -1410,10 +1410,10 @@ function switchPage(page) {
 
 function totalVolHours() { return 0; } // removed - no longer tracked
 function totalVolSavings() {
-  // Savings = actual spent x 1.45
-  // (Based on $800K market value / $550K budget = 1.45x multiplier)
+  // Savings = (spent x 1.45) - spent = spent x 0.45
+  // Represents the difference between market rate and actual spend
   var spent = totalSpent();
-  return Math.round(spent * 1.45);
+  return Math.round(spent * 0.45);
 }
 
 function renderVolKPI() {
@@ -2213,8 +2213,8 @@ function renderOverview() {
     var pct = totalItems > 0 ? Math.round(checkedItems / totalItems * 100) : 0;
     var hasProjects = ph.projects && ph.projects.length > 0;
     var shortName = ph.name.replace(/Phase \d+: /, '');
-    var status = checkedItems === 0 ? 'NOT STARTED' : checkedItems === totalItems ? 'COMPLETE' : 'IN PROGRESS';
-    var statusColor = status === 'COMPLETE' ? '#2a7a5a' : status === 'IN PROGRESS' ? '#c47f18' : '#6c757d';
+    var status = checkedItems === 0 ? 'NOT STARTED' : checkedItems === totalItems ? 'DONE' : 'IN PROGRESS';
+    var statusColor = status === 'DONE' ? '#1a5fa8' : status === 'IN PROGRESS' ? '#c47f18' : '#6c757d';
 
     // QBO budget data for this phase
     var phBudget = ph.budget || 0;
@@ -2587,7 +2587,7 @@ function renderQBOBreakdown() {
   if (window._qboUpdated) {
     var d = new Date(window._qboUpdated);
     var formatted = d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-    if (dateEl) dateEl.textContent = 'Budget data sourced from QuickBooks. Last updated: ' + formatted;
+    if (dateEl) dateEl.textContent = 'Budget Data: Last Updated ' + formatted;
     if (bannerDate) bannerDate.textContent = formatted;
     if (banner) banner.style.display = 'flex';
   }
