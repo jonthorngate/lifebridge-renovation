@@ -108,7 +108,15 @@ app.get('/api/public-data', async (req, res) => {
 });
 
 // ── Admin-only routes ──────────────────────────────────────
-app.get('/', requireAuth, (req, res) => {
+app.get('/', (req, res, next) => {
+  // If accessing from a custom domain (not railway.app), redirect to /public
+  const host = req.hostname || '';
+  const isRailwayUrl = host.includes('railway.app');
+  if (!isRailwayUrl) {
+    return res.redirect('/public');
+  }
+  requireAuth(req, res, next);
+}, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
