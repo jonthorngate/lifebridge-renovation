@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>LifeBridge QBO Pusher — April 30, 2026</title>
+  <title>LifeBridge QBO Pusher — May 31, 2026</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 640px; margin: 60px auto; padding: 20px; background: #f5f7fa; }
     .card { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
@@ -23,21 +23,25 @@
 <body>
   <div class="card">
     <h2>LifeBridge QBO Data Pusher</h2>
-    <p>Statement of Activity &nbsp;·&nbsp; <b>June 4, 2025 – April 30, 2026</b></p>
+    <p>Statement of Activity &nbsp;·&nbsp; <b>July 1, 2025 – May 31, 2026</b></p>
     <div class="summary">
-      <b>Phase 1 — $24,949.46 spent of $200,000</b><br>
-      <span class="i">Leased Space Demo + Rough Construction: $7,722.78</span><br>
-      <span class="ii">Demo & Misc.: $2,462.97</span><br>
-      <span class="ii">Framing for New Walls + Layout: $5,259.81</span><br>
-      <span class="i">Leased Space Mechanicals: $4,223.60</span><br>
-      <span class="ii">Electrical + Low Voltage: $4,223.60</span><br>
-      <span class="i">Leased Space Finishing: $2,934.76</span><br>
-      <span class="ii">Drywall and Paint: $2,934.76</span><br>
-      <span class="i">Admin & Management: $10,068.32</span><br>
-      <span class="ii">Project Planning, Design & Management: $7,923.82</span><br>
+      <b>Phase 1 — $42,753.55 spent of $200,000</b><br>
+      <span class="i">Leased Space Demo + Rough Construction: $9,288.91</span><br>
+      <span class="ii">Demo & Misc.: $3,298.09</span><br>
+      <span class="ii">Framing for New Walls + Layout: $5,990.82</span><br>
+      <span class="i">Leased Space Mechanicals: $12,310.51</span><br>
+      <span class="ii">Plumbing — Bathroom + Kitchenette: $4,900.00</span><br>
+      <span class="ii">Electrical + Low Voltage: $3,912.41</span><br>
+      <span class="ii">HVAC — Moving for Layout: $3,498.10</span><br>
+      <span class="i">Leased Space Finishing: $9,256.81</span><br>
+      <span class="ii">Drywall and Paint: $6,434.76</span><br>
+      <span class="ii">Windows + Doors: $955.40</span><br>
+      <span class="ii">Finish Construction: $1,866.65</span><br>
+      <span class="i">Admin & Management: $11,897.32</span><br>
+      <span class="ii">Project Planning, Design & Management: $9,752.82</span><br>
       <span class="ii">Approvals and Permits: $2,144.50</span><br>
       <b>Phase 2 & 3:</b> $0 (no spend yet)<br>
-      <b>Report date:</b> April 30, 2026
+      <b>Report date:</b> May 31, 2026
     </div>
     <br>
     <button onclick="pushData()" id="push-btn">Push QBO Data to Tracker</button>
@@ -45,10 +49,10 @@
   </div>
   <script>
     const payload = {
-  "lb_qbo_data": "[{\"account\": \"1000\", \"name\": \"Phase 1 - Planning, 473 Demo, Exterior Rebuild & Leased Space\", \"budget\": 200000, \"spent\": 24949.46, \"projects\": [{\"account\": \"1100\", \"name\": \"Leased Space Demo + Rough Construction\", \"budget\": 8000, \"spent\": 7722.78, \"subcats\": [{\"account\": \"1101\", \"name\": \"Demo & Misc.\", \"spent\": 2462.97}, {\"account\": \"1102\", \"name\": \"Framing for New Walls + Layout\", \"spent\": 5259.81}]}, {\"account\": \"1200\", \"name\": \"Leased Space Mechanicals\", \"budget\": 18000, \"spent\": 4223.6, \"subcats\": [{\"account\": \"1202\", \"name\": \"Electrical + Low Voltage\", \"spent\": 4223.6}]}, {\"account\": \"1300\", \"name\": \"Leased Space Finishing\", \"budget\": 33500, \"spent\": 2934.76, \"subcats\": [{\"account\": \"1302\", \"name\": \"Drywall and Paint\", \"spent\": 2934.76}]}, {\"account\": \"1400\", \"name\": \"473 Site Work + Utilities\", \"budget\": 29000, \"spent\": 0, \"subcats\": []}, {\"account\": \"1500\", \"name\": \"473 Rear Demo + Exterior Rebuild\", \"budget\": 39500, \"spent\": 0, \"subcats\": []}, {\"account\": \"1600\", \"name\": \"Covered Walkway + Patio Finishing\", \"budget\": 18500, \"spent\": 0, \"subcats\": []}, {\"account\": \"1700\", \"name\": \"Admin & Management\", \"budget\": 39500, \"spent\": 10068.32, \"subcats\": [{\"account\": \"1701\", \"name\": \"Project Planning, Design & Management\", \"spent\": 7923.82}, {\"account\": \"1702\", \"name\": \"Approvals and Permits\", \"spent\": 2144.5}]}, {\"account\": \"1800\", \"name\": \"Contingency\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}]}, {\"account\": \"2000\", \"name\": \"Phase 2 - Connecting Addition + 473 Remodel\", \"budget\": 200000, \"spent\": 0, \"projects\": [{\"account\": \"2100\", \"name\": \"Addition Shell\", \"budget\": 55000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2200\", \"name\": \"Addition Mechanicals\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2300\", \"name\": \"Addition Interior Finishing\", \"budget\": 20000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2400\", \"name\": \"Openings + 473 Existing Space Remodeling\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2500\", \"name\": \"Facade Finishing\", \"budget\": 28000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2600\", \"name\": \"Admin & Management\", \"budget\": 29000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2700\", \"name\": \"Contingency\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}]}, {\"account\": \"3000\", \"name\": \"Phase 3 - Remodel Church Building\", \"budget\": 150000, \"spent\": 0, \"projects\": [{\"account\": \"3100\", \"name\": \"Move Bathrooms\", \"budget\": 25000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3200\", \"name\": \"Expand Lobby + Add Security Doors\", \"budget\": 21500, \"spent\": 0, \"subcats\": []}, {\"account\": \"3300\", \"name\": \"Cry Room + Prayer Room\", \"budget\": 21000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3400\", \"name\": \"Open Up/Expand Worship Space\", \"budget\": 35000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3500\", \"name\": \"Conference Room\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3600\", \"name\": \"Admin & Management\", \"budget\": 23000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3700\", \"name\": \"Contingency\", \"budget\": 10500, \"spent\": 0, \"subcats\": []}]}]",
+  "lb_qbo_data": "[{\"account\": \"1000\", \"name\": \"Phase 1 - Planning, 473 Demo, Exterior Rebuild & Leased Space\", \"budget\": 200000, \"spent\": 42753.55, \"projects\": [{\"account\": \"1100\", \"name\": \"Leased Space Demo + Rough Construction\", \"budget\": 8000, \"spent\": 9288.91, \"subcats\": [{\"account\": \"1101\", \"name\": \"Demo & Misc.\", \"spent\": 3298.09}, {\"account\": \"1102\", \"name\": \"Framing for New Walls + Layout\", \"spent\": 5990.82}]}, {\"account\": \"1200\", \"name\": \"Leased Space Mechanicals\", \"budget\": 18000, \"spent\": 12310.51, \"subcats\": [{\"account\": \"1201\", \"name\": \"Plumbing \\u2014 Bathroom + Kitchenette\", \"spent\": 4900.0}, {\"account\": \"1202\", \"name\": \"Electrical + Low Voltage\", \"spent\": 3912.41}, {\"account\": \"1203\", \"name\": \"HVAC \\u2014 Moving for Layout\", \"spent\": 3498.1}]}, {\"account\": \"1300\", \"name\": \"Leased Space Finishing\", \"budget\": 33500, \"spent\": 9256.81, \"subcats\": [{\"account\": \"1302\", \"name\": \"Drywall and Paint\", \"spent\": 6434.76}, {\"account\": \"1304\", \"name\": \"Windows + Doors\", \"spent\": 955.4}, {\"account\": \"1305\", \"name\": \"Finish Construction\", \"spent\": 1866.65}]}, {\"account\": \"1400\", \"name\": \"473 Site Work + Utilities\", \"budget\": 29000, \"spent\": 0, \"subcats\": []}, {\"account\": \"1500\", \"name\": \"473 Rear Demo + Exterior Rebuild\", \"budget\": 39500, \"spent\": 0, \"subcats\": []}, {\"account\": \"1600\", \"name\": \"Covered Walkway + Patio Finishing\", \"budget\": 18500, \"spent\": 0, \"subcats\": []}, {\"account\": \"1700\", \"name\": \"Admin & Management\", \"budget\": 39500, \"spent\": 11897.32, \"subcats\": [{\"account\": \"1701\", \"name\": \"Project Planning, Design & Management\", \"spent\": 9752.82}, {\"account\": \"1702\", \"name\": \"Approvals and Permits\", \"spent\": 2144.5}]}, {\"account\": \"1800\", \"name\": \"Contingency\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}]}, {\"account\": \"2000\", \"name\": \"Phase 2 - Connecting Addition + 473 Remodel\", \"budget\": 200000, \"spent\": 0, \"projects\": [{\"account\": \"2100\", \"name\": \"Addition Shell\", \"budget\": 55000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2200\", \"name\": \"Addition Mechanicals\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2300\", \"name\": \"Addition Interior Finishing\", \"budget\": 20000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2400\", \"name\": \"Openings + 473 Existing Space Remodeling\", \"budget\": 27000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2500\", \"name\": \"Facade Finishing\", \"budget\": 28000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2600\", \"name\": \"Admin & Management\", \"budget\": 29000, \"spent\": 0, \"subcats\": []}, {\"account\": \"2700\", \"name\": \"Contingency\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}]}, {\"account\": \"3000\", \"name\": \"Phase 3 - Remodel Church Building\", \"budget\": 150000, \"spent\": 0, \"projects\": [{\"account\": \"3100\", \"name\": \"Move Bathrooms\", \"budget\": 25000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3200\", \"name\": \"Expand Lobby + Add Security Doors\", \"budget\": 21500, \"spent\": 0, \"subcats\": []}, {\"account\": \"3300\", \"name\": \"Cry Room + Prayer Room\", \"budget\": 21000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3400\", \"name\": \"Open Up/Expand Worship Space\", \"budget\": 35000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3500\", \"name\": \"Conference Room\", \"budget\": 14000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3600\", \"name\": \"Admin & Management\", \"budget\": 23000, \"spent\": 0, \"subcats\": []}, {\"account\": \"3700\", \"name\": \"Contingency\", \"budget\": 10500, \"spent\": 0, \"subcats\": []}]}]",
   "lb_year_budgets": "{\"2026\": 200000, \"2027\": 200000, \"2028\": 150000}",
   "lb_expenses2": "[]",
-  "lb_qbo_updated": "2026-04-30T12:00:00"
+  "lb_qbo_updated": "2026-05-31T12:00:00"
 };
     async function pushData() {
       const btn = document.getElementById('push-btn');
@@ -63,7 +67,7 @@
         const d = await r.json();
         if (d.ok) {
           statusEl.className = 'success';
-          statusEl.innerHTML = '✓ Data pushed! Tracker updated as of <b>April 30, 2026</b>.<br><br><a href="/" style="color:#155724;font-weight:600;">Go to tracker →</a>';
+          statusEl.innerHTML = '✓ Data pushed! Tracker updated as of <b>May 31, 2026</b>.<br><br><a href="/" style="color:#155724;font-weight:600;">Go to tracker →</a>';
           btn.textContent = 'Done ✓';
         } else throw new Error(d.error || 'Unknown error');
       } catch(e) {
